@@ -1,13 +1,25 @@
-import { Router, Request, Response } from 'express';
+import { Router } from 'express';
+import { AuthController } from '../controllers/authController';
+import { authenticateToken } from '../middleware/auth';
+import { validateRequest } from '../middleware/validation';
+import { z } from 'zod';
 
 const router = Router();
+const authController = new AuthController();
 
-router.post('/register', (_req: Request, res: Response) => {
-  res.json({ success: false, message: 'Route under construction' });
+const authSchema = z.object({
+  email: z.string().email('Invalid email format'),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+      'Password must contain at least one lowercase letter, one uppercase letter, and one number'
+    ),
 });
 
-router.post('/login', (_req: Request, res: Response) => {
-  res.json({ success: false, message: 'Route under construction' });
-});
+router.post('/auth', validateRequest(authSchema), authController.authenticate);
+router.get('/profile', authenticateToken, authController.profile);
+router.post('/refresh-token', authenticateToken, authController.refreshToken);
 
 export default router;

@@ -1,0 +1,141 @@
+import bcrypt from 'bcrypt';
+import { prisma } from '../models/index';
+import { generateToken } from '../utils/jwt';
+import {
+  LoginRequest,
+  UnifiedAuthResponse,
+  TeamGenerationStatus,
+  INITIAL_BUDGET,
+} from '../types/index';
+
+export class AuthService {
+  private saltRounds = 12;
+
+  async authenticate(data: LoginRequest): Promise<UnifiedAuthResponse> {
+    const { email, password } = data;
+
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (existingUser) {
+      const isValidPassword = await bcrypt.compare(password, existingUser.password);
+
+      if (!isValidPassword) {
+        throw new Error('Invalid password');
+      }
+
+      const token = generateToken({
+        userId: existingUser.id,
+        email: existingUser.email,
+      });
+
+      return {
+        token,
+        user: {
+          id: existingUser.id,
+          email: existingUser.email,
+          budget: existingUser.budget,
+          teamGenerationStatus: existingUser.teamGenerationStatus,
+        },
+        isNewUser: false,
+      };
+    } else {
+      const hashedPassword = await bcrypt.hash(password, this.saltRounds);
+
+      const newUser = await prisma.user.create({
+        data: {
+          email,
+          password: hashedPassword,
+          budget: INITIAL_BUDGET,
+          teamGenerationStatus: TeamGenerationStatus.PENDING,
+        },
+      });
+
+      const token = generateToken({
+        userId: newUser.id,
+        email: newUser.email,
+      });
+
+      return {
+        token,
+        user: {
+          id: newUser.id,
+          email: newUser.email,
+          budget: newUser.budget,
+          teamGenerationStatus: newUser.teamGenerationStatus,
+        },
+        isNewUser: true,
+      };
+    }
+  }
+
+  async getProfile(userId: string): Promise<{
+    id: string;
+    email: string;
+    budget: number;
+    teamGenerationStatus: TeamGenerationStatus;
+    teamGeneratedAt: Date | null;
+    createdAt: Date;
+  }> {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        budget: true,
+        teamGenerationStatus: true,
+        teamGeneratedAt: true,
+        createdAt: true,
+      },
+    });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    return user;
+  }
+
+  async refreshToken(userId: string): Promise<{ token: string }> {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+      },
+    });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const token = generateToken({
+      userId: user.id,
+      email: user.email,
+    });
+
+    return { token };
+  }
+
+  async updateUserBudget(userId: string, newBudget: number): Promise<void> {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { budget: newBudget },
+    });
+  }
+
+  async updateTeamGenerationStatus(
+    userId: string,
+    status: TeamGenerationStatus,
+    teamGeneratedAt?: Date | null
+  ): Promise<void> {
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        teamGenerationStatus: status,
+        ...(teamGeneratedAt !== undefined && { teamGeneratedAt }),
+      },
+    });
+  }
+}
