@@ -138,4 +138,56 @@ export class AuthService {
       },
     });
   }
+
+  async forgotPassword(email: string): Promise<void> {
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      // For security, don't reveal if email exists or not
+      return;
+    }
+
+    const resetToken = generateToken({ userId: user.id, email: user.email }, '1h');
+    const resetTokenExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        resetToken,
+        resetTokenExpiry,
+      },
+    });
+
+    // TODO: Send email with reset link
+    console.log(`Password reset token for ${email}: ${resetToken}`);
+    console.log(`Reset link: http://localhost:3000/reset-password?token=${resetToken}`);
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    const user = await prisma.user.findFirst({
+      where: {
+        resetToken: token,
+        resetTokenExpiry: {
+          gt: new Date(),
+        },
+      },
+    });
+
+    if (!user) {
+      throw new Error('Invalid or expired reset token');
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, this.saltRounds);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        resetToken: null,
+        resetTokenExpiry: null,
+      },
+    });
+  }
 }

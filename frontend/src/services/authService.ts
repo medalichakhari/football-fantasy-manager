@@ -71,6 +71,40 @@ class AuthService {
   isAuthenticated(): boolean {
     return !!this.getToken();
   }
+
+  async forgotPassword(
+    email: string
+  ): Promise<{ success: boolean; message?: string; error?: string }> {
+    try {
+      const response = await axios.post(`${this.baseURL}/forgot-password`, {
+        email,
+      });
+      return response.data;
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.response?.data?.error || "Failed to send reset email",
+      };
+    }
+  }
+
+  async resetPassword(
+    token: string,
+    password: string
+  ): Promise<{ success: boolean; message?: string; error?: string }> {
+    try {
+      const response = await axios.post(`${this.baseURL}/reset-password`, {
+        token,
+        password,
+      });
+      return response.data;
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.response?.data?.error || "Failed to reset password",
+      };
+    }
+  }
 }
 
 export const authService = new AuthService();

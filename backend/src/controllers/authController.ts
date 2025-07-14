@@ -62,4 +62,38 @@ export class AuthController {
       });
     }
   };
+
+  forgotPassword = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { email } = req.body;
+      await this.authService.forgotPassword(email);
+
+      res.status(200).json({
+        success: true,
+        message: 'Password reset email sent successfully',
+      });
+    } catch (error) {
+      res.status(400).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to send reset email',
+      });
+    }
+  };
+
+  resetPassword = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { token, password } = req.body;
+      await this.authService.resetPassword(token, password);
+
+      res.status(200).json({
+        success: true,
+        message: 'Password reset successfully',
+      });
+    } catch (error) {
+      res.status(400).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Password reset failed',
+      });
+    }
+  };
 }

@@ -4,13 +4,13 @@ import { JWTPayload } from '../types/index';
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
-export const generateToken = (payload: JWTPayload): string => {
+export const generateToken = (payload: JWTPayload, expiresIn?: string): string => {
   if (!JWT_SECRET) {
     throw new Error('JWT_SECRET is not defined');
   }
 
   return jwt.sign(payload, JWT_SECRET, {
-    expiresIn: JWT_EXPIRES_IN,
+    expiresIn: expiresIn || JWT_EXPIRES_IN,
   } as SignOptions);
 };
 
