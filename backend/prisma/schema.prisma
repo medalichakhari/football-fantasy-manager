@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  budget    Int      @default(5000000)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  teamGenerationStatus TeamGenerationStatus @default(PENDING)
+  teamGeneratedAt      DateTime?
+
+  ownedPlayers     UserPlayer[]
+  transferListings TransferListing[]
+
+  @@map("users")
+}
+
+model Player {
+  id       String   @id @default(cuid())
+  name     String
+  position Position
+  team     String
+  price    Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  owners           UserPlayer[]
+  transferListings TransferListing[]
+
+  @@map("players")
+}
+
+model UserPlayer {
+  id       String @id @default(cuid())
+  userId   String
+  playerId String
+
+  acquiredAt DateTime @default(now())
+  price      Int
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, playerId])
+  @@map("user_players")
+}
+
+model TransferListing {
+  id       String @id @default(cuid())
+  sellerId String
+  playerId String
+  price    Int
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  seller User   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@map("transfer_listings")
+}
+
+enum Position {
+  GK
+  DEF
+  MID
+  ATT
+}
+
+enum TeamGenerationStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
