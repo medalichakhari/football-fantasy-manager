@@ -18,6 +18,9 @@ model User {
   teamGenerationStatus TeamGenerationStatus @default(PENDING)
   teamGeneratedAt      DateTime?
 
+  resetToken       String?
+  resetTokenExpiry DateTime?
+
   ownedPlayers     UserPlayer[]
   transferListings TransferListing[]
 

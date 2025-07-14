@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import { prisma } from '../models/index';
 import { generateToken } from '../utils/jwt';
+import { EmailService } from './emailService';
 import {
   LoginRequest,
   UnifiedAuthResponse,
@@ -10,6 +11,11 @@ import {
 
 export class AuthService {
   private saltRounds = 12;
+  private emailService: EmailService;
+
+  constructor() {
+    this.emailService = new EmailService();
+  }
 
   async authenticate(data: LoginRequest): Promise<UnifiedAuthResponse> {
     const { email, password } = data;
@@ -56,6 +62,13 @@ export class AuthService {
         userId: newUser.id,
         email: newUser.email,
       });
+
+      // Send welcome email
+      try {
+        await this.emailService.sendWelcomeEmail(newUser.email, newUser.email);
+      } catch (error) {
+        console.error('Failed to send welcome email:', error);
+      }
 
       return {
         token,
@@ -160,9 +173,13 @@ export class AuthService {
       },
     });
 
-    // TODO: Send email with reset link
-    console.log(`Password reset token for ${email}: ${resetToken}`);
-    console.log(`Reset link: http://localhost:3000/reset-password?token=${resetToken}`);
+    // Send password reset email
+    try {
+      await this.emailService.sendPasswordResetEmail(user.email, user.email, resetToken);
+      console.log(`Password reset email sent to ${email}`);
+    } catch (error) {
+      console.error('Failed to send password reset email:', error);
+    }
   }
 
   async resetPassword(token: string, newPassword: string): Promise<void> {

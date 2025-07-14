@@ -7,8 +7,6 @@ export const errorHandler = (
   res: Response,
   _next: NextFunction
 ): void => {
-  console.error('Error:', error);
-
   let statusCode = 500;
   let message = 'Internal Server Error';
 

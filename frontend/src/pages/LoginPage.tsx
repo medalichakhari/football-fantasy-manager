@@ -52,7 +52,6 @@ export default function LoginPage() {
       }
     },
     onError: (error: any) => {
-      console.error("Authentication failed:", error);
       setError("root", {
         type: "manual",
         message: "Authentication failed. Please check your credentials.",
