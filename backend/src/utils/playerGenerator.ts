@@ -171,6 +171,23 @@ export const generatePlayerPrice = (position: Position): number => {
   return Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
 };
 
+export const generateRandomPlayer = (
+  position: Position,
+  price: number
+): {
+  name: string;
+  position: Position;
+  team: string;
+  price: number;
+} => {
+  return {
+    name: generatePlayerName(),
+    position,
+    team: generateRandomTeam(),
+    price,
+  };
+};
+
 export const generateTeamComposition = (): Array<{
   name: string;
   position: Position;
