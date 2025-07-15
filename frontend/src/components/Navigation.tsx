@@ -1,16 +1,24 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
+import { useAuthStore } from "../store/authStore";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Navigation() {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { isAuthenticated, user } = useAuthStore();
+  const { logout } = useAuth();
 
   const navItems = [
     { path: "/", label: "Home" },
-    { path: "/dashboard", label: "Dashboard" },
-    { path: "/team", label: "My Team" },
-    { path: "/transfers", label: "Transfers" },
+    ...(isAuthenticated
+      ? [
+          { path: "/dashboard", label: "Dashboard" },
+          { path: "/my-team", label: "My Team" },
+          { path: "/transfers", label: "Transfers" },
+        ]
+      : []),
   ];
 
   return (
@@ -44,12 +52,22 @@ export default function Navigation() {
               </Link>
             ))}
 
-            <Link
-              to="/login"
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:shadow-lg hover:scale-105 transition-all duration-200 flex items-center space-x-2"
-            >
-              <span>Login</span>
-            </Link>
+            {isAuthenticated ? (
+              <button
+                onClick={logout}
+                className="bg-gradient-to-r from-red-500 to-red-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:shadow-lg hover:scale-105 transition-all duration-200 flex items-center space-x-2"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Logout</span>
+              </button>
+            ) : (
+              <Link
+                to="/login"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:shadow-lg hover:scale-105 transition-all duration-200 flex items-center space-x-2"
+              >
+                <span>Login</span>
+              </Link>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -85,13 +103,26 @@ export default function Navigation() {
                   {item.label}
                 </Link>
               ))}
-              <Link
-                to="/login"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:shadow-lg transition-all duration-200 text-center mx-2"
-              >
-                Login
-              </Link>
+              {isAuthenticated ? (
+                <button
+                  onClick={() => {
+                    logout();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:shadow-lg transition-all duration-200 text-center mx-2 flex items-center justify-center space-x-2"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Logout</span>
+                </button>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:shadow-lg transition-all duration-200 text-center mx-2"
+                >
+                  Login
+                </Link>
+              )}
             </div>
           </div>
         )}
