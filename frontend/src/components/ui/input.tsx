@@ -1,5 +1,5 @@
 import { forwardRef, InputHTMLAttributes } from "react";
-import { cn } from "../../utils/cn";
+import { cn } from "../../utils";
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   error?: string;
