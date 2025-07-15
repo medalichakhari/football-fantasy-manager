@@ -109,7 +109,7 @@ export class EmailService {
 
     return this.sendEmail({
       to: userEmail,
-      subject: 'Welcome to Football Fantasy Manager! 🏆',
+      subject: 'Welcome to Football Fantasy Manager!',
       template: 'welcome',
       data: {
         title: 'Welcome to Football Fantasy Manager',
@@ -136,6 +136,21 @@ export class EmailService {
         userName,
         resetUrl,
         expirationTime,
+      },
+    });
+  }
+
+  async sendTeamGenerationCompleteEmail(userEmail: string, userName: string): Promise<boolean> {
+    const teamUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/my-team`;
+
+    return this.sendEmail({
+      to: userEmail,
+      subject: 'Your Team is Ready! 🏆 - Football Fantasy Manager',
+      template: 'team-generation-complete',
+      data: {
+        title: 'Your Team is Ready!',
+        userName,
+        teamUrl,
       },
     });
   }
