@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useMutation } from "@tanstack/react-query";
 import { useNavigate, Link } from "react-router-dom";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
-import { authService } from "../services/authService";
-import { useAuthContext } from "../contexts/AuthContext";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import { LoadingSpinner } from "../../components/ui/states";
+import { useAuth } from "../../hooks/useAuth";
+import { useAuthStore } from "../../store/authStore";
 
 const authSchema = z.object({
   email: z
@@ -30,12 +30,13 @@ type AuthFormData = z.infer<typeof authSchema>;
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
   const navigate = useNavigate();
-  const { login } = useAuthContext();
+  const { isAuthenticated } = useAuthStore();
+  const { login, isLoggingIn, loginError } = useAuth();
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     setError,
     clearErrors,
   } = useForm<AuthFormData>({
@@ -43,25 +44,25 @@ export default function LoginPage() {
     mode: "onBlur",
   });
 
-  const authMutation = useMutation({
-    mutationFn: (data: AuthFormData) => authService.authenticate(data),
-    onSuccess: (response) => {
-      if (response.success && response.data) {
-        login(response.data.token, response.data.user);
-        navigate("/dashboard");
-      }
-    },
-    onError: (error: any) => {
-      setError("root", {
-        type: "manual",
-        message: "Authentication failed. Please check your credentials.",
-      });
-    },
-  });
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
 
   const onSubmit = async (data: AuthFormData) => {
     clearErrors();
-    authMutation.mutate(data);
+    try {
+      await login(data);
+      // Navigation is handled by the auth hook after successful login
+    } catch (error) {
+      setError("root", {
+        type: "manual",
+        message:
+          loginError || "Authentication failed. Please check your credentials.",
+      });
+    }
   };
 
   const toggleMode = () => {
@@ -102,7 +103,7 @@ export default function LoginPage() {
                     ? "border-red-500 focus:border-red-500 focus:ring-red-500"
                     : ""
                 }`}
-                disabled={authMutation.isPending}
+                disabled={isLoggingIn}
               />
               {errors.email && (
                 <p className="text-sm text-red-600 flex items-center">
@@ -129,7 +130,7 @@ export default function LoginPage() {
                     ? "border-red-500 focus:border-red-500 focus:ring-red-500"
                     : ""
                 }`}
-                disabled={authMutation.isPending}
+                disabled={isLoggingIn}
               />
               {errors.password && (
                 <p className="text-sm text-red-600 flex items-center">
@@ -150,11 +151,11 @@ export default function LoginPage() {
               </div>
             )}
 
-            {errors.root && (
+            {(errors.root || loginError) && (
               <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
                 <p className="text-sm text-red-600 flex items-center">
                   <span className="mr-1">⚠️</span>
-                  {errors.root.message}
+                  {errors.root?.message || loginError}
                 </p>
               </div>
             )}
@@ -162,11 +163,11 @@ export default function LoginPage() {
             <Button
               type="submit"
               className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-              disabled={authMutation.isPending}
+              disabled={isLoggingIn}
             >
-              {authMutation.isPending ? (
+              {isLoggingIn ? (
                 <div className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  <LoadingSpinner size="sm" className="mr-2" />
                   {isLogin ? "Signing in..." : "Creating account..."}
                 </div>
               ) : isLogin ? (
@@ -183,7 +184,7 @@ export default function LoginPage() {
               <button
                 onClick={toggleMode}
                 className="ml-2 text-blue-600 hover:text-blue-800 font-medium transition-colors"
-                disabled={authMutation.isPending}
+                disabled={isLoggingIn}
               >
                 {isLogin ? "Sign up" : "Sign in"}
               </button>

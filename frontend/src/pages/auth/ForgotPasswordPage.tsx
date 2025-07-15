@@ -4,10 +4,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { ArrowLeft, Mail } from "lucide-react";
-import { authService } from "../services/authService";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
+import { useAuth } from "../../hooks/useAuth";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
 
 const forgotPasswordSchema = z.object({
   email: z
@@ -20,7 +20,7 @@ type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
 export default function ForgotPasswordPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const { forgotPassword, isSendingResetEmail } = useAuth();
 
   const {
     register,
@@ -31,20 +31,13 @@ export default function ForgotPasswordPage() {
   });
 
   const onSubmit = async (data: ForgotPasswordFormData) => {
-    setIsLoading(true);
     try {
-      const result = await authService.forgotPassword(data.email);
-      if (result.success) {
-        setIsSubmitted(true);
-      }
+      await forgotPassword(data.email);
       // Always show success message for security (don't reveal if email exists)
       setIsSubmitted(true);
     } catch (error) {
-      console.error("Forgot password error:", error);
       // Always show success message for security
       setIsSubmitted(true);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -119,10 +112,10 @@ export default function ForgotPasswordPage() {
 
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isSendingResetEmail}
               className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:scale-105 transition-all duration-200"
             >
-              {isLoading ? "Sending..." : "Send Reset Link"}
+              {isSendingResetEmail ? "Sending..." : "Send Reset Link"}
             </Button>
           </form>
 

@@ -1,116 +1,115 @@
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-import {
-  authService,
-  AuthRequest,
-  AuthResponse,
-} from "../services/authService";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { apiClient, handleApiResponse } from "../lib/api-client";
+import { AuthRequest, AuthResponse } from "../types/auth";
+import { useAuthStore } from "../store/authStore";
 
-export interface UseAuthForm {
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
+const authApi = {
+  authenticate: async (credentials: AuthRequest): Promise<AuthResponse> => {
+    const response = await apiClient.post<AuthResponse>(
+      "/auth/authenticate",
+      credentials
+    );
+    return handleApiResponse(response);
+  },
 
-export interface UseAuthFormErrors {
-  email?: string;
-  password?: string;
-  confirmPassword?: string;
-  general?: string;
-}
+  getProfile: async () => {
+    const response = await apiClient.get("/auth/profile");
+    return handleApiResponse(response);
+  },
 
-export function useAuth() {
-  const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState<UseAuthForm>({
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-  const [errors, setErrors] = useState<UseAuthFormErrors>({});
+  forgotPassword: async (email: string) => {
+    const response = await apiClient.post("/auth/forgot-password", { email });
+    return handleApiResponse(response);
+  },
 
-  const validateForm = (): boolean => {
-    const newErrors: UseAuthFormErrors = {};
-
-    // Email validation
-    if (!formData.email) {
-      newErrors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
-    }
-
-    // Password validation
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
-    } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-      newErrors.password =
-        "Password must contain at least one lowercase letter, one uppercase letter, and one number";
-    }
-
-    // Confirm password validation (only for registration)
-    if (!isLogin) {
-      if (!formData.confirmPassword) {
-        newErrors.confirmPassword = "Please confirm your password";
-      } else if (formData.password !== formData.confirmPassword) {
-        newErrors.confirmPassword = "Passwords do not match";
-      }
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const authMutation = useMutation<AuthResponse, Error, AuthRequest>({
-    mutationFn: authService.authenticate,
-    onSuccess: (data) => {
-      if (data.success) {
-        // Handle successful authentication
-        window.location.href = "/dashboard";
-      } else {
-        setErrors({ general: data.error || "Authentication failed" });
-      }
-    },
-    onError: (error) => {
-      setErrors({ general: error.message || "An unexpected error occurred" });
-    },
-  });
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrors({});
-
-    if (!validateForm()) {
-      return;
-    }
-
-    authMutation.mutate({
-      email: formData.email,
-      password: formData.password,
+  resetPassword: async (token: string, password: string) => {
+    const response = await apiClient.post("/auth/reset-password", {
+      token,
+      password,
     });
-  };
+    return handleApiResponse(response);
+  },
+};
 
-  const updateField = (field: keyof UseAuthForm, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    // Clear field error when user starts typing
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: undefined }));
-    }
-  };
+export const useAuth = () => {
+  const { login, logout, setLoading, setError, clearError } = useAuthStore();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
-  const toggleMode = () => {
-    setIsLogin(!isLogin);
-    setErrors({});
-    setFormData({ email: formData.email, password: "", confirmPassword: "" });
+  const loginMutation = useMutation({
+    mutationFn: authApi.authenticate,
+    onMutate: () => {
+      setLoading(true);
+      clearError();
+    },
+    onSuccess: (data) => {
+      if (data.success && data.data) {
+        login(data.data.token, data.data.user);
+        queryClient.invalidateQueries();
+        navigate("/dashboard");
+      } else {
+        setError(data.error || "Authentication failed");
+      }
+    },
+    onError: (error: Error) => {
+      setError(error.message);
+    },
+    onSettled: () => {
+      setLoading(false);
+    },
+  });
+
+  const forgotPasswordMutation = useMutation({
+    mutationFn: authApi.forgotPassword,
+    onSuccess: (data) => {
+      if (!data.success) {
+        throw new Error(data.error || "Failed to send reset email");
+      }
+    },
+  });
+
+  const resetPasswordMutation = useMutation({
+    mutationFn: ({ token, password }: { token: string; password: string }) =>
+      authApi.resetPassword(token, password),
+    onSuccess: (data) => {
+      if (!data.success) {
+        throw new Error(data.error || "Failed to reset password");
+      }
+    },
+  });
+
+  const profileQuery = useQuery({
+    queryKey: ["profile"],
+    queryFn: authApi.getProfile,
+    enabled: !!useAuthStore.getState().token,
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+  });
+
+  const handleLogout = () => {
+    logout();
+    queryClient.clear();
+    navigate("/login");
   };
 
   return {
-    isLogin,
-    formData,
-    errors,
-    isLoading: authMutation.isPending,
-    handleSubmit,
-    updateField,
-    toggleMode,
+    login: loginMutation.mutate,
+    logout: handleLogout,
+    forgotPassword: forgotPasswordMutation.mutate,
+    resetPassword: resetPasswordMutation.mutate,
+
+    isLoggingIn: loginMutation.isPending,
+    isSendingResetEmail: forgotPasswordMutation.isPending,
+    isResettingPassword: resetPasswordMutation.isPending,
+    isLoadingProfile: profileQuery.isLoading,
+
+    profile: profileQuery.data,
+
+    // Errors
+    loginError: loginMutation.error?.message,
+    resetEmailError: forgotPasswordMutation.error?.message,
+    resetPasswordError: resetPasswordMutation.error?.message,
+    profileError: profileQuery.error?.message,
   };
-}
+};

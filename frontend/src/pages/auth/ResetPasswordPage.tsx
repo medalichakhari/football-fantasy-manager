@@ -4,10 +4,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { ArrowLeft, Eye, EyeOff, CheckCircle } from "lucide-react";
-import { authService } from "../services/authService";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
+import { useAuth } from "../../hooks/useAuth";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
 
 const resetPasswordSchema = z
   .object({
@@ -32,10 +32,10 @@ export default function ResetPasswordPage() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const { resetPassword, isResettingPassword } = useAuth();
   const token = searchParams.get("token");
 
   const {
@@ -58,24 +58,17 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    setIsLoading(true);
     setError(null);
 
     try {
-      const result = await authService.resetPassword(token, data.password);
-      if (result.success) {
-        setIsSuccess(true);
-        // Redirect to login after 3 seconds
-        setTimeout(() => {
-          navigate("/login");
-        }, 3000);
-      } else {
-        setError(result.message || "Failed to reset password");
-      }
+      await resetPassword({ token, password: data.password });
+      setIsSuccess(true);
+      // Redirect to login after 3 seconds
+      setTimeout(() => {
+        navigate("/login");
+      }, 3000);
     } catch (error: any) {
-      setError(error.response?.data?.message || "Failed to reset password");
-    } finally {
-      setIsLoading(false);
+      setError(error.message || "Failed to reset password");
     }
   };
 
@@ -231,10 +224,10 @@ export default function ResetPasswordPage() {
 
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isResettingPassword}
               className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:scale-105 transition-all duration-200"
             >
-              {isLoading ? "Resetting..." : "Reset Password"}
+              {isResettingPassword ? "Resetting..." : "Reset Password"}
             </Button>
           </form>
 
