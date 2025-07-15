@@ -6,7 +6,6 @@ import { useNavigate, Link } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
-import { LoadingSpinner } from "../../components/ui/states";
 import { useAuth } from "../../hooks/useAuth";
 import { useAuthStore } from "../../store/authStore";
 
@@ -162,19 +161,12 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              size="lg"
+              className="w-full"
+              loading={isLoggingIn}
               disabled={isLoggingIn}
             >
-              {isLoggingIn ? (
-                <div className="flex items-center justify-center">
-                  <LoadingSpinner size="sm" className="mr-2" />
-                  {isLogin ? "Signing in..." : "Creating account..."}
-                </div>
-              ) : isLogin ? (
-                "Sign in"
-              ) : (
-                "Create account"
-              )}
+              {isLogin ? "Sign in" : "Create account"}
             </Button>
           </form>
 
