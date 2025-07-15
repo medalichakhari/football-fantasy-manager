@@ -24,15 +24,6 @@ export const formatPrice = (price: number): string => {
   }).format(price);
 };
 
-export const isValidEmail = (email: string): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-};
-
-export const isValidPassword = (password: string): boolean => {
-  return password.length >= 6;
-};
-
 export const ERROR_MESSAGES = {
   INVALID_CREDENTIALS: 'Invalid email or password',
   USER_ALREADY_EXISTS: 'User with this email already exists',

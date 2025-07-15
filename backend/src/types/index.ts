@@ -1,59 +1,22 @@
-export interface User {
-  id: string;
-  email: string;
-  password: string;
-  budget: number;
-  teamGenerationStatus: TeamGenerationStatus;
-  teamGeneratedAt?: Date;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { Request } from 'express';
+import {
+  User as PrismaUser,
+  Player as PrismaPlayer,
+  UserPlayer as PrismaUserPlayer,
+  TransferListing as PrismaTransferListing,
+  Position,
+  TeamGenerationStatus,
+} from '@prisma/client';
 
-export interface Player {
-  id: string;
-  name: string;
-  position: Position;
-  team: string;
-  price: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
+export interface User extends PrismaUser {}
 
-export interface UserPlayer {
-  id: string;
-  userId: string;
-  playerId: string;
-  acquiredAt: Date;
-  price: number;
-  user?: User;
-  player?: Player;
-}
+export interface Player extends PrismaPlayer {}
 
-export interface TransferListing {
-  id: string;
-  sellerId: string;
-  playerId: string;
-  price: number;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  seller?: User;
-  player?: Player;
-}
+export interface UserPlayer extends PrismaUserPlayer {}
 
-export enum Position {
-  GK = 'GK',
-  DEF = 'DEF',
-  MID = 'MID',
-  ATT = 'ATT',
-}
+export interface TransferListing extends PrismaTransferListing {}
 
-export enum TeamGenerationStatus {
-  PENDING = 'PENDING',
-  PROCESSING = 'PROCESSING',
-  COMPLETED = 'COMPLETED',
-  FAILED = 'FAILED',
-}
+export { Position, TeamGenerationStatus };
 
 export interface RegisterRequest {
   email: string;
@@ -75,6 +38,10 @@ export interface AuthResponse {
   };
 }
 
+export interface UnifiedAuthResponse extends AuthResponse {
+  isNewUser: boolean;
+}
+
 export interface TeamResponse {
   players: (UserPlayer & { player: Player })[];
   budget: number;
@@ -88,7 +55,7 @@ export interface TeamResponse {
 }
 
 export interface TransferMarketResponse {
-  listings: (TransferListing & { player: Player; seller: User })[];
+  listings: TransferListingWithRelations[];
   totalCount: number;
   page: number;
   limit: number;
@@ -139,3 +106,36 @@ export const TEAM_REQUIREMENTS = {
 } as const;
 
 export const INITIAL_BUDGET = 5000000;
+
+export interface AuthenticatedRequest extends Request {
+  user: {
+    userId: string;
+    email: string;
+  };
+}
+
+export interface TeamStatsResponse {
+  goalkeepers: number;
+  defenders: number;
+  midfielders: number;
+  attackers: number;
+  totalPlayers: number;
+  totalValue: number;
+  averageValue: number;
+}
+
+export interface TeamGenerationResponse {
+  message: string;
+  status: TeamGenerationStatus;
+}
+
+export interface TransferListingWithRelations extends TransferListing {
+  player: Player;
+  seller: Pick<User, 'id' | 'email'>;
+}
+
+export interface BuyPlayerResponse {
+  player: Player;
+  price: number;
+  newBudget: number;
+}
