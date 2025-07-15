@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import { prisma } from '../models/index';
 import { generateToken } from '../utils/jwt';
 import { EmailService } from './emailService';
+import { TeamGenerationJob } from '../jobs/teamGeneration';
 import {
   LoginRequest,
   UnifiedAuthResponse,
@@ -12,9 +13,11 @@ import {
 export class AuthService {
   private saltRounds = 12;
   private emailService: EmailService;
+  private teamGenerationJob: TeamGenerationJob;
 
   constructor() {
     this.emailService = new EmailService();
+    this.teamGenerationJob = new TeamGenerationJob();
   }
 
   async authenticate(data: LoginRequest): Promise<UnifiedAuthResponse> {
@@ -54,7 +57,7 @@ export class AuthService {
           email,
           password: hashedPassword,
           budget: INITIAL_BUDGET,
-          teamGenerationStatus: TeamGenerationStatus.PENDING,
+          teamGenerationStatus: TeamGenerationStatus.PROCESSING,
         },
       });
 
@@ -63,12 +66,20 @@ export class AuthService {
         email: newUser.email,
       });
 
-      // Send welcome email
       try {
         await this.emailService.sendWelcomeEmail(newUser.email, newUser.email);
       } catch (error) {
         console.error('Failed to send welcome email:', error);
       }
+
+      setImmediate(async () => {
+        try {
+          await this.teamGenerationJob.execute(newUser.id);
+          console.log(`Team generation completed for new user: ${newUser.email}`);
+        } catch (error) {
+          console.error(`Team generation failed for new user ${newUser.email}:`, error);
+        }
+      });
 
       return {
         token,
