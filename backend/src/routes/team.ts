@@ -1,9 +1,12 @@
-import { Router, Request, Response } from 'express';
+import { Router } from 'express';
+import { TeamController } from '../controllers/teamController';
+import { authenticateToken } from '../middleware/auth';
 
 const router = Router();
+const teamController = new TeamController();
 
-router.get('/my-team', (_req: Request, res: Response) => {
-  res.json({ success: false, message: 'Route under construction' });
-});
+router.get('/my-team', authenticateToken, teamController.getTeam);
+router.post('/generate', authenticateToken, teamController.generateTeam);
+router.get('/stats', authenticateToken, teamController.getTeamStats);
 
 export default router;

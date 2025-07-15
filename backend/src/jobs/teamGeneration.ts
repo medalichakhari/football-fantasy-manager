@@ -1,19 +1,36 @@
 import { prisma } from '../models/index';
 import { generateRandomPlayer } from '../utils/playerGenerator';
 import { Position, TEAM_REQUIREMENTS, INITIAL_BUDGET, TeamGenerationStatus } from '../types/index';
+import { EmailService } from '../services/emailService';
 
 export class TeamGenerationJob {
+  private emailService: EmailService;
+
+  constructor() {
+    this.emailService = new EmailService();
+  }
+
   async execute(userId: string): Promise<void> {
     try {
       await this.generateTeamForUser(userId);
 
-      await prisma.user.update({
+      const user = await prisma.user.update({
         where: { id: userId },
         data: {
           teamGenerationStatus: TeamGenerationStatus.COMPLETED,
           teamGeneratedAt: new Date(),
         },
+        select: {
+          email: true,
+        },
       });
+
+      try {
+        await this.emailService.sendTeamGenerationCompleteEmail(user.email, user.email);
+        console.log(`Team generation completion email sent to ${user.email}`);
+      } catch (emailError) {
+        console.error('Failed to send team generation completion email:', emailError);
+      }
     } catch (error) {
       await prisma.user.update({
         where: { id: userId },
