@@ -39,19 +39,4 @@ export class TeamController {
       handleError(res, error, 'Team generation failed', 400);
     }
   };
-
-  getTeamStats = async (req: Request, res: Response): Promise<void> => {
-    try {
-      const userId = (req as AuthenticatedRequest).user.userId;
-      const stats = await this.teamService.getTeamStats(userId);
-
-      res.status(200).json({
-        success: true,
-        data: stats,
-        message: 'Team stats retrieved successfully',
-      });
-    } catch (error) {
-      handleError(res, error, 'Team stats not found', 404);
-    }
-  };
 }

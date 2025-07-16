@@ -4,7 +4,6 @@ import {
   TeamResponse,
   TeamGenerationStatus,
   Position,
-  TeamStatsResponse,
   TeamGenerationResponse,
   Player,
 } from '../types/index';
@@ -34,32 +33,14 @@ export class TeamService {
       orderBy: [{ player: { position: 'asc' } }, { player: { name: 'asc' } }],
     });
 
-    const teamStats = this.calculateTeamStats(userPlayers.map(up => up.player));
-
+    const teamStats = this.calculateTeamStats(
+      userPlayers.map(up => up.player),
+      userPlayers
+    );
     return {
       players: userPlayers,
       budget: user.budget,
       teamStats,
-    };
-  }
-
-  async getTeamStats(userId: string): Promise<TeamStatsResponse> {
-    const userPlayers = await prisma.userPlayer.findMany({
-      where: { userId },
-      include: {
-        player: true,
-      },
-    });
-
-    const players = userPlayers.map(up => up.player);
-    const teamStats = this.calculateTeamStats(players);
-    const totalValue = userPlayers.reduce((sum, up) => sum + up.price, 0);
-    const averageValue = players.length > 0 ? totalValue / players.length : 0;
-
-    return {
-      ...teamStats,
-      totalValue,
-      averageValue: Math.round(averageValue),
     };
   }
 
@@ -105,12 +86,16 @@ export class TeamService {
     };
   }
 
-  private calculateTeamStats(players: Player[]): {
+  private calculateTeamStats(
+    players: Player[],
+    userPlayers?: Array<{ price: number }>
+  ): {
     goalkeepers: number;
     defenders: number;
     midfielders: number;
     attackers: number;
     totalPlayers: number;
+    totalValue?: number;
   } {
     const stats = {
       goalkeepers: 0,
@@ -118,6 +103,7 @@ export class TeamService {
       midfielders: 0,
       attackers: 0,
       totalPlayers: players.length,
+      ...(userPlayers && { totalValue: userPlayers.reduce((sum, up) => sum + up.price, 0) }),
     };
 
     return players.reduce((acc, player) => {

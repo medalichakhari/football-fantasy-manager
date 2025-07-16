@@ -7,6 +7,5 @@ const teamController = new TeamController();
 
 router.get('/my-team', authenticateToken, teamController.getTeam);
 router.post('/generate', authenticateToken, teamController.generateTeam);
-router.get('/stats', authenticateToken, teamController.getTeamStats);
 
 export default router;
