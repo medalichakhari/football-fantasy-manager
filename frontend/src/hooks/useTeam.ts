@@ -1,10 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient, handleApiResponse } from "../lib/api-client";
-import {
-  TeamResponse,
-  TeamStatsResponse,
-  TeamGenerationResponse,
-} from "../types/team";
+import { TeamResponse, TeamGenerationResponse } from "../types/team";
 import { useTeamStore } from "../store/teamStore";
 import { useEffect } from "react";
 
@@ -22,14 +18,6 @@ const teamApi = {
       success: boolean;
       data: TeamGenerationResponse;
     }>("/team/generate");
-    return handleApiResponse(response).data;
-  },
-
-  getTeamStats: async (): Promise<TeamStatsResponse> => {
-    const response = await apiClient.get<{
-      success: boolean;
-      data: TeamStatsResponse;
-    }>("/team/stats");
     return handleApiResponse(response).data;
   },
 };
@@ -57,13 +45,6 @@ export const useTeam = () => {
       }
       return failureCount < 3;
     },
-  });
-
-  const teamStatsQuery = useQuery({
-    queryKey: ["team-stats"],
-    queryFn: teamApi.getTeamStats,
-    enabled: !!teamQuery.data?.players?.length,
-    staleTime: 2 * 60 * 1000, // 2 minutes
   });
 
   const generateTeamMutation = useMutation({
@@ -113,27 +94,14 @@ export const useTeam = () => {
     return pollInterval;
   };
 
-  const handleNewUserFlow = () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const isNewUser = urlParams.get("newUser") === "true";
-
-    if (isNewUser && teamQuery.error?.message?.includes("Team not found")) {
-      setGenerating(true);
-      startPolling();
-    }
-  };
-
   return {
     teamData: teamQuery.data,
-    teamStats: teamStatsQuery.data,
 
     isLoadingTeam: teamQuery.isLoading,
-    isLoadingStats: teamStatsQuery.isLoading,
     isGenerating,
 
     generateTeam: generateTeamMutation.mutate,
     refetchTeam: teamQuery.refetch,
-    handleNewUserFlow,
 
     teamError: teamQuery.error?.message,
     generateError: generateTeamMutation.error?.message,

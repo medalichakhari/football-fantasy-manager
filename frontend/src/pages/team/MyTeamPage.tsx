@@ -34,13 +34,8 @@ export default function MyTeamPage() {
     isGenerating,
     generateTeam,
     refetchTeam,
-    handleNewUserFlow,
     teamError,
   } = useTeam();
-
-  useEffect(() => {
-    handleNewUserFlow();
-  }, []);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -84,9 +79,7 @@ export default function MyTeamPage() {
       />
     );
   }
-
   const playersByPosition = groupPlayersByPosition(teamData.players);
-  const totalValue = 5000000 - teamData.budget;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8">
@@ -99,7 +92,6 @@ export default function MyTeamPage() {
         <TeamStatsCards
           stats={teamData.teamStats}
           budget={teamData.budget}
-          totalValue={totalValue}
           className="mb-8"
         />
 

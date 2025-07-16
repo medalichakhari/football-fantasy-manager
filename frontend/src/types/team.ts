@@ -29,6 +29,7 @@ export interface TeamStats {
   midfielders: number;
   attackers: number;
   totalPlayers: number;
+  totalValue?: number;
 }
 
 export interface TeamResponse {

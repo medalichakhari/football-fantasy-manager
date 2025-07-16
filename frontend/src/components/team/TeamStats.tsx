@@ -38,14 +38,12 @@ const StatsCard = ({
 interface TeamStatsCardsProps {
   stats: TeamStats;
   budget: number;
-  totalValue?: number;
   className?: string;
 }
 
 export const TeamStatsCards = ({
   stats,
   budget,
-  totalValue = 0,
   className,
 }: TeamStatsCardsProps) => {
   const formation = `${stats.defenders}-${stats.midfielders}-${stats.attackers}`;
@@ -73,7 +71,7 @@ export const TeamStatsCards = ({
 
       <StatsCard
         title="Team Value"
-        value={formatCurrency(totalValue)}
+        value={formatCurrency(stats.totalValue || 0)}
         icon={TrendingUp}
         iconColor="bg-purple-100 text-purple-600"
       />
