@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { AuthService } from '../services/authService';
 import { LoginRequest, AuthenticatedRequest } from '../types/index';
+import { handleError } from '../utils/errorHandler';
 
 export class AuthController {
   private authService: AuthService;
@@ -20,10 +21,7 @@ export class AuthController {
         message: result.isNewUser ? 'User registered successfully' : 'Login successful',
       });
     } catch (error) {
-      res.status(400).json({
-        success: false,
-        error: error instanceof Error ? error.message : 'Authentication failed',
-      });
+      handleError(res, error, 'Authentication failed', 400);
     }
   };
 
@@ -38,10 +36,7 @@ export class AuthController {
         message: 'Profile retrieved successfully',
       });
     } catch (error) {
-      res.status(404).json({
-        success: false,
-        error: error instanceof Error ? error.message : 'Profile not found',
-      });
+      handleError(res, error, 'Profile not found', 404);
     }
   };
 
@@ -56,10 +51,7 @@ export class AuthController {
         message: 'Token refreshed successfully',
       });
     } catch (error) {
-      res.status(401).json({
-        success: false,
-        error: error instanceof Error ? error.message : 'Token refresh failed',
-      });
+      handleError(res, error, 'Token refresh failed', 401);
     }
   };
 
@@ -73,10 +65,7 @@ export class AuthController {
         message: 'Password reset email sent successfully',
       });
     } catch (error) {
-      res.status(400).json({
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to send reset email',
-      });
+      handleError(res, error, 'Failed to send reset email', 400);
     }
   };
 
@@ -90,10 +79,7 @@ export class AuthController {
         message: 'Password reset successfully',
       });
     } catch (error) {
-      res.status(400).json({
-        success: false,
-        error: error instanceof Error ? error.message : 'Password reset failed',
-      });
+      handleError(res, error, 'Password reset failed', 400);
     }
   };
 }
