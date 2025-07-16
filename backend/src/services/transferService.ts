@@ -181,13 +181,23 @@ export class TransferService {
         },
       });
 
+      await tx.player.update({
+        where: { id: listing.playerId },
+        data: {
+          price: listing.price,
+        },
+      });
+
       await tx.transferListing.update({
         where: { id: transferListingId },
         data: { isActive: false },
       });
 
       return {
-        player: listing.player,
+        player: {
+          ...listing.player,
+          price: listing.price,
+        },
         price: listing.price,
         newBudget: buyer.budget - listing.price,
       };
