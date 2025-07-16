@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { Plus, Users } from "lucide-react";
 import { useTransfer } from "../../hooks/useTransfer";
 import { TransferMarketFilters } from "../../types/transfer";
 import { PageHeader } from "../../components/ui/page-header";
@@ -114,19 +114,7 @@ const TransferMarketPage: React.FC = () => {
             {marketData?.listings?.length === 0 ? (
               <div className="text-center py-12 px-6">
                 <div className="text-gray-400 mb-4">
-                  <svg
-                    className="mx-auto h-12 w-12"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1}
-                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
-                    />
-                  </svg>
+                  <Users className="mx-auto h-12 w-12" />
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
                   No players available

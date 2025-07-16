@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Search, Filter } from "lucide-react";
 import { Card, CardContent } from "../ui/card";
+import { Input } from "../ui/input";
 import { TransferMarketFilters } from "../../types/transfer";
 
 interface FilterPanelProps {
@@ -79,14 +80,16 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
       <CardContent className="p-6">
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search players or teams..."
-              value={localSearch}
-              onChange={(e) => setLocalSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-            />
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
+              <Input
+                type="text"
+                placeholder="Search players or teams..."
+                value={localSearch}
+                onChange={(e) => setLocalSearch(e.target.value)}
+                className="pl-10"
+              />
+            </div>
             <p className="mt-1 text-xs text-gray-500">
               Search by player name or team
             </p>
@@ -94,9 +97,9 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
 
           <button
             onClick={onToggleAdvanced}
-            className="flex items-center justify-center gap-2 px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+            className="flex items-center justify-center gap-2 h-11 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm"
           >
-            <Filter className="h-5 w-5" />
+            <Filter className="h-4 w-4" />
             Filters
           </button>
         </div>
@@ -113,7 +116,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                   handleImmediateFilterChange("position", e.target.value)
                 }
                 title="Filter by position"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className="w-full h-11 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none transition-colors bg-white text-sm"
               >
                 <option value="">All Positions</option>
                 <option value="GK">Goalkeeper</option>
@@ -128,15 +131,15 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                 Min Price
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
                   <span className="text-gray-500 sm:text-sm">$</span>
                 </div>
-                <input
+                <Input
                   type="number"
                   placeholder="Min price"
                   value={localMinPrice}
                   onChange={(e) => setLocalMinPrice(e.target.value)}
-                  className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className="pl-7"
                 />
               </div>
             </div>
@@ -146,15 +149,15 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                 Max Price
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
                   <span className="text-gray-500 sm:text-sm">$</span>
                 </div>
-                <input
+                <Input
                   type="number"
                   placeholder="Max price"
                   value={localMaxPrice}
                   onChange={(e) => setLocalMaxPrice(e.target.value)}
-                  className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className="pl-7"
                 />
               </div>
             </div>

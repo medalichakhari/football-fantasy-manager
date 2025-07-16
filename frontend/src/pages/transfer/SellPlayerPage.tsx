@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
 import { PlayerCard } from "../../components/player/PlayerCard";
 import { PlayerAvatar } from "../../components/ui/player-avatar";
 import { PositionBadge } from "../../components/ui/position-badge";
@@ -96,7 +97,7 @@ const SellPlayerPage: React.FC = () => {
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeWidth={1}
+                    strokeWidth={2}
                     d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
                   />
                 </svg>
@@ -200,16 +201,16 @@ const SellPlayerPage: React.FC = () => {
                       Listing Price
                     </label>
                     <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
                         <span className="text-gray-500 sm:text-sm">$</span>
                       </div>
-                      <input
+                      <Input
                         type="number"
                         id="price"
                         value={listingPrice}
                         onChange={(e) => setListingPrice(e.target.value)}
                         placeholder="Enter price"
-                        className="w-full pl-7 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                        className="pl-7"
                         required
                       />
                     </div>
@@ -256,7 +257,7 @@ const SellPlayerPage: React.FC = () => {
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        strokeWidth={1}
+                        strokeWidth={2}
                         d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 0h10m-10 0a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V6a2 2 0 00-2-2"
                       />
                     </svg>
