@@ -51,6 +51,7 @@ export interface TeamResponse {
     midfielders: number;
     attackers: number;
     totalPlayers: number;
+    totalValue?: number;
   };
 }
 
