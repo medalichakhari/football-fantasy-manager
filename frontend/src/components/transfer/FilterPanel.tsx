@@ -10,7 +10,6 @@ interface FilterPanelProps {
   onToggleAdvanced: () => void;
 }
 
-// Custom debounce hook
 const useDebounce = (value: string, delay: number) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
@@ -41,39 +40,33 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
     filters.maxPrice?.toString() || ""
   );
 
-  const debouncedSearch = useDebounce(localSearch, 800);
-  const debouncedMinPrice = useDebounce(localMinPrice, 800);
-  const debouncedMaxPrice = useDebounce(localMaxPrice, 800);
+  const debouncedSearch = useDebounce(localSearch, 300);
+  const debouncedMinPrice = useDebounce(localMinPrice, 500);
+  const debouncedMaxPrice = useDebounce(localMaxPrice, 500);
 
   useEffect(() => {
-    if (debouncedSearch !== filters.search) {
+    if (debouncedSearch.trim().length >= 2 || debouncedSearch.trim() === "") {
       onFilterChange("search", debouncedSearch);
     }
-  }, [debouncedSearch, filters.search, onFilterChange]);
+  }, [debouncedSearch, onFilterChange]);
 
   useEffect(() => {
-    if (debouncedMinPrice !== filters.minPrice?.toString()) {
+    if (
+      debouncedMinPrice === "" ||
+      (!isNaN(Number(debouncedMinPrice)) && Number(debouncedMinPrice) >= 0)
+    ) {
       onFilterChange("minPrice", debouncedMinPrice);
     }
-  }, [debouncedMinPrice, filters.minPrice, onFilterChange]);
+  }, [debouncedMinPrice, onFilterChange]);
 
   useEffect(() => {
-    if (debouncedMaxPrice !== filters.maxPrice?.toString()) {
+    if (
+      debouncedMaxPrice === "" ||
+      (!isNaN(Number(debouncedMaxPrice)) && Number(debouncedMaxPrice) >= 0)
+    ) {
       onFilterChange("maxPrice", debouncedMaxPrice);
     }
-  }, [debouncedMaxPrice, filters.maxPrice, onFilterChange]);
-
-  useEffect(() => {
-    setLocalSearch(filters.search || "");
-  }, [filters.search]);
-
-  useEffect(() => {
-    setLocalMinPrice(filters.minPrice?.toString() || "");
-  }, [filters.minPrice]);
-
-  useEffect(() => {
-    setLocalMaxPrice(filters.maxPrice?.toString() || "");
-  }, [filters.maxPrice]);
+  }, [debouncedMaxPrice, onFilterChange]);
 
   const handleImmediateFilterChange = useCallback(
     (key: keyof TransferMarketFilters, value: string) => {

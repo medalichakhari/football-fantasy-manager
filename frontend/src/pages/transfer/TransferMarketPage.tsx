@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { useTransfer } from "../../hooks/useTransfer";
@@ -28,20 +28,21 @@ const TransferMarketPage: React.FC = () => {
     useTransfer();
   const { data: marketData, isLoading, error } = useMarketListings(filters);
 
-  const handleFilterChange = (
-    key: keyof TransferMarketFilters,
-    value: string
-  ) => {
-    setFilters((prev: TransferMarketFilters) => ({
-      ...prev,
-      [key]:
-        key === "minPrice" || key === "maxPrice"
-          ? value === ""
-            ? undefined
-            : Number(value)
-          : value,
-    }));
-  };
+  const handleFilterChange = useCallback(
+    (key: keyof TransferMarketFilters, value: string) => {
+      setFilters((prev: TransferMarketFilters) => ({
+        ...prev,
+        [key]:
+          key === "minPrice" || key === "maxPrice"
+            ? value === ""
+              ? undefined
+              : Number(value)
+            : value,
+        ...(key !== "page" && { page: 1 }),
+      }));
+    },
+    []
+  );
 
   const handleBuyPlayer = (listingId: string) => {
     buyPlayer({ transferListingId: listingId });

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient, handleApiResponse } from "../lib/api-client";
+import { ApiResponse } from "../types/auth";
 import {
   TransferMarketResponse,
   TransferMarketFilters,
@@ -16,43 +17,47 @@ const transferApi = {
     const params = new URLSearchParams();
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== "") {
-        params.append(key, value.toString());
+        const stringValue =
+          typeof value === "number" ? value.toString() : value;
+        params.append(key, stringValue);
       }
     });
 
-    const response = await apiClient.get<TransferMarketResponse>(
+    const response = await apiClient.get<ApiResponse<TransferMarketResponse>>(
       `/transfer/market?${params}`
     );
-    return handleApiResponse(response).data;
+    return handleApiResponse(response).data!;
   },
 
   getUserListings: async (): Promise<TransferListing[]> => {
-    const response = await apiClient.get<TransferListing[]>(
+    const response = await apiClient.get<ApiResponse<TransferListing[]>>(
       "/transfer/my-listings"
     );
-    return handleApiResponse(response).data;
+    return handleApiResponse(response).data!;
   },
 
   createListing: async (
     data: CreateTransferListingRequest
   ): Promise<TransferListing> => {
-    const response = await apiClient.post<TransferListing>(
+    const response = await apiClient.post<ApiResponse<TransferListing>>(
       "/transfer/market",
       data
     );
-    return handleApiResponse(response).data;
+    return handleApiResponse(response).data!;
   },
 
   buyPlayer: async (data: BuyPlayerRequest): Promise<BuyPlayerResponse> => {
-    const response = await apiClient.post<BuyPlayerResponse>(
+    const response = await apiClient.post<ApiResponse<BuyPlayerResponse>>(
       "/transfer/buy",
       data
     );
-    return handleApiResponse(response).data;
+    return handleApiResponse(response).data!;
   },
 
   removeListing: async (listingId: string): Promise<void> => {
-    const response = await apiClient.delete(`/transfer/listings/${listingId}`);
+    const response = await apiClient.delete<ApiResponse<void>>(
+      `/transfer/listings/${listingId}`
+    );
     return handleApiResponse(response).data;
   },
 };
@@ -64,7 +69,13 @@ export const useTransfer = () => {
     return useQuery({
       queryKey: ["transferMarket", filters],
       queryFn: () => transferApi.getMarketListings(filters),
-      staleTime: 30 * 1000,
+      staleTime: 30 * 1000, // 30 seconds
+      gcTime: 5 * 60 * 1000, // 5 minutes
+      refetchOnWindowFocus: false,
+      enabled:
+        Object.values(filters).some(
+          (value) => value !== undefined && value !== "" && value !== null
+        ) || Object.keys(filters).length === 0,
     });
   };
 
