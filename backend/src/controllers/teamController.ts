@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { TeamService } from '../services/teamService';
 import { AuthenticatedRequest } from '../types/index';
+import { handleError } from '../utils/errorHandler';
 
 export class TeamController {
   private teamService: TeamService;
@@ -20,10 +21,7 @@ export class TeamController {
         message: 'Team retrieved successfully',
       });
     } catch (error) {
-      res.status(404).json({
-        success: false,
-        error: error instanceof Error ? error.message : 'Team not found',
-      });
+      handleError(res, error, 'Team not found', 404);
     }
   };
 
@@ -38,10 +36,7 @@ export class TeamController {
         message: 'Team generation initiated',
       });
     } catch (error) {
-      res.status(400).json({
-        success: false,
-        error: error instanceof Error ? error.message : 'Team generation failed',
-      });
+      handleError(res, error, 'Team generation failed', 400);
     }
   };
 
@@ -56,10 +51,7 @@ export class TeamController {
         message: 'Team stats retrieved successfully',
       });
     } catch (error) {
-      res.status(404).json({
-        success: false,
-        error: error instanceof Error ? error.message : 'Team stats not found',
-      });
+      handleError(res, error, 'Team stats not found', 404);
     }
   };
 }

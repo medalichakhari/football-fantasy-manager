@@ -4,7 +4,6 @@ import {
   TeamResponse,
   TeamGenerationStatus,
   Position,
-  TEAM_REQUIREMENTS,
   TeamStatsResponse,
   TeamGenerationResponse,
   Player,
@@ -121,63 +120,24 @@ export class TeamService {
       totalPlayers: players.length,
     };
 
-    players.forEach(player => {
+    return players.reduce((acc, player) => {
       switch (player.position) {
         case Position.GK:
-          stats.goalkeepers++;
+          acc.goalkeepers++;
           break;
         case Position.DEF:
-          stats.defenders++;
+          acc.defenders++;
           break;
         case Position.MID:
-          stats.midfielders++;
+          acc.midfielders++;
           break;
         case Position.ATT:
-          stats.attackers++;
+          acc.attackers++;
+          break;
+        default:
           break;
       }
-    });
-
-    return stats;
-  }
-
-  async validateTeamComposition(userId: string): Promise<{
-    isValid: boolean;
-    errors: string[];
-  }> {
-    const userPlayers = await prisma.userPlayer.findMany({
-      where: { userId },
-      include: {
-        player: true,
-      },
-    });
-
-    const stats = this.calculateTeamStats(userPlayers.map(up => up.player));
-    const errors: string[] = [];
-
-    if (stats.goalkeepers !== TEAM_REQUIREMENTS.GOALKEEPERS) {
-      errors.push(`Team must have exactly ${TEAM_REQUIREMENTS.GOALKEEPERS} goalkeepers`);
-    }
-
-    if (stats.defenders !== TEAM_REQUIREMENTS.DEFENDERS) {
-      errors.push(`Team must have exactly ${TEAM_REQUIREMENTS.DEFENDERS} defenders`);
-    }
-
-    if (stats.midfielders !== TEAM_REQUIREMENTS.MIDFIELDERS) {
-      errors.push(`Team must have exactly ${TEAM_REQUIREMENTS.MIDFIELDERS} midfielders`);
-    }
-
-    if (stats.attackers !== TEAM_REQUIREMENTS.ATTACKERS) {
-      errors.push(`Team must have exactly ${TEAM_REQUIREMENTS.ATTACKERS} attackers`);
-    }
-
-    if (stats.totalPlayers !== TEAM_REQUIREMENTS.TOTAL) {
-      errors.push(`Team must have exactly ${TEAM_REQUIREMENTS.TOTAL} players`);
-    }
-
-    return {
-      isValid: errors.length === 0,
-      errors,
-    };
+      return acc;
+    }, stats);
   }
 }

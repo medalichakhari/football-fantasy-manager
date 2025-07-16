@@ -76,15 +76,11 @@ export const FIRST_NAMES = [
   'Lucas',
   'Mason',
   'Logan',
-  'Alexander',
   'Ethan',
-  'Jacob',
-  'Michael',
-  'Daniel',
   'Henry',
   'Jackson',
   'Sebastian',
-];
+] as const;
 
 export const LAST_NAMES = [
   'Smith',
@@ -159,18 +155,6 @@ export const generateRandomTeam = (): string => {
   return FOOTBALL_TEAMS[Math.floor(Math.random() * FOOTBALL_TEAMS.length)];
 };
 
-export const generatePlayerPrice = (position: Position): number => {
-  const basePrices = {
-    [Position.GK]: { min: 50000, max: 300000 },
-    [Position.DEF]: { min: 80000, max: 500000 },
-    [Position.MID]: { min: 100000, max: 800000 },
-    [Position.ATT]: { min: 150000, max: 1200000 },
-  };
-
-  const range = basePrices[position];
-  return Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
-};
-
 export const generateRandomPlayer = (
   position: Position,
   price: number
@@ -186,53 +170,6 @@ export const generateRandomPlayer = (
     team: generateRandomTeam(),
     price,
   };
-};
-
-export const generateTeamComposition = (): Array<{
-  name: string;
-  position: Position;
-  team: string;
-  price: number;
-}> => {
-  const players = [];
-
-  for (let i = 0; i < TEAM_REQUIREMENTS.GOALKEEPERS; i++) {
-    players.push({
-      name: generatePlayerName(),
-      position: Position.GK,
-      team: generateRandomTeam(),
-      price: generatePlayerPrice(Position.GK),
-    });
-  }
-
-  for (let i = 0; i < TEAM_REQUIREMENTS.DEFENDERS; i++) {
-    players.push({
-      name: generatePlayerName(),
-      position: Position.DEF,
-      team: generateRandomTeam(),
-      price: generatePlayerPrice(Position.DEF),
-    });
-  }
-
-  for (let i = 0; i < TEAM_REQUIREMENTS.MIDFIELDERS; i++) {
-    players.push({
-      name: generatePlayerName(),
-      position: Position.MID,
-      team: generateRandomTeam(),
-      price: generatePlayerPrice(Position.MID),
-    });
-  }
-
-  for (let i = 0; i < TEAM_REQUIREMENTS.ATTACKERS; i++) {
-    players.push({
-      name: generatePlayerName(),
-      position: Position.ATT,
-      team: generateRandomTeam(),
-      price: generatePlayerPrice(Position.ATT),
-    });
-  }
-
-  return players;
 };
 
 export const calculateTeamValue = (players: { price: number }[]): number => {
