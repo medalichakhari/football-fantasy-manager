@@ -6,6 +6,7 @@ import {
   BuyPlayerRequest,
   TransferMarketFilters,
 } from '../types/index';
+import { handleError } from '../utils/errorHandler';
 
 export class TransferController {
   private transferService: TransferService;
@@ -25,10 +26,7 @@ export class TransferController {
         message: 'Market listings retrieved successfully',
       });
     } catch (error) {
-      res.status(400).json({
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to get listings',
-      });
+      handleError(res, error, 'Failed to get listings', 400);
     }
   };
 
@@ -44,10 +42,7 @@ export class TransferController {
         message: 'Transfer listing created successfully',
       });
     } catch (error) {
-      res.status(400).json({
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to create listing',
-      });
+      handleError(res, error, 'Failed to create listing', 400);
     }
   };
 
@@ -63,10 +58,7 @@ export class TransferController {
         message: 'Player purchased successfully',
       });
     } catch (error) {
-      res.status(400).json({
-        success: false,
-        error: error instanceof Error ? error.message : 'Purchase failed',
-      });
+      handleError(res, error, 'Purchase failed', 400);
     }
   };
 
@@ -81,10 +73,7 @@ export class TransferController {
         message: 'User listings retrieved successfully',
       });
     } catch (error) {
-      res.status(400).json({
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to get user listings',
-      });
+      handleError(res, error, 'Failed to get user listings', 400);
     }
   };
 
@@ -99,10 +88,7 @@ export class TransferController {
         message: 'Listing removed successfully',
       });
     } catch (error) {
-      res.status(400).json({
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to remove listing',
-      });
+      handleError(res, error, 'Failed to remove listing', 400);
     }
   };
 }
