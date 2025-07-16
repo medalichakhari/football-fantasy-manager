@@ -7,6 +7,7 @@ import {
   TransferMarketFilters,
 } from '../types/index';
 import { handleError } from '../utils/errorHandler';
+import { MarketListingsQuery } from '../validation/transferValidation';
 
 export class TransferController {
   private transferService: TransferService;
@@ -17,16 +18,36 @@ export class TransferController {
 
   getMarketListings = async (req: Request, res: Response): Promise<void> => {
     try {
-      const filters: TransferMarketFilters = req.query;
+      const validatedQuery = req.query as unknown as MarketListingsQuery;
+
+      const filters: TransferMarketFilters = {
+        ...(validatedQuery.position && { position: validatedQuery.position }),
+        ...(validatedQuery.search && { search: validatedQuery.search }),
+        ...(validatedQuery.minPrice !== undefined && { minPrice: validatedQuery.minPrice }),
+        ...(validatedQuery.maxPrice !== undefined && { maxPrice: validatedQuery.maxPrice }),
+        page: validatedQuery.page,
+        limit: validatedQuery.limit,
+      };
+
       const listings = await this.transferService.getMarketListings(filters);
 
       res.status(200).json({
         success: true,
         data: listings,
         message: 'Market listings retrieved successfully',
+        meta: {
+          page: filters.page,
+          limit: filters.limit,
+          appliedFilters: {
+            ...(filters.position && { position: filters.position }),
+            ...(filters.search && { search: filters.search }),
+            ...(filters.minPrice && { minPrice: filters.minPrice }),
+            ...(filters.maxPrice && { maxPrice: filters.maxPrice }),
+          },
+        },
       });
     } catch (error) {
-      handleError(res, error, 'Failed to get listings', 400);
+      handleError(res, error, 'Failed to retrieve market listings', 400);
     }
   };
 

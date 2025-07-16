@@ -1,33 +1,47 @@
 import { Request, Response, NextFunction } from 'express';
-import { ZodSchema, ZodError, ZodIssue } from 'zod';
-import { ApiResponse } from '../types/index';
+import { ZodSchema, ZodError } from 'zod';
 
-export const validate = (
-  schema: ZodSchema,
-  source: 'body' | 'query' = 'body'
-): ((req: Request, res: Response, next: NextFunction) => void) => {
-  return (req: Request, res: Response, next: NextFunction): void => {
+export interface ValidationSchemas {
+  query?: ZodSchema;
+  body?: ZodSchema;
+  params?: ZodSchema;
+}
+
+export const validateMultiple = (schemas: ValidationSchemas) => {
+  return async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
     try {
-      const data = source === 'body' ? req.body : req.query;
-      schema.parse(data);
+      if (schemas.query) {
+        req.query = await schemas.query.parseAsync(req.query);
+      }
+
+      if (schemas.body) {
+        req.body = await schemas.body.parseAsync(req.body);
+      }
+
+      if (schemas.params) {
+        req.params = await schemas.params.parseAsync(req.params);
+      }
+
       next();
     } catch (error) {
       if (error instanceof ZodError) {
-        const response: ApiResponse = {
+        const validationErrors = error.errors.map(err => ({
+          field: err.path.join('.'),
+          message: err.message,
+          code: err.code,
+        }));
+
+        return res.status(400).json({
           success: false,
-          error: 'Validation error',
-          message: error.errors
-            .map((err: ZodIssue) => `${err.path.join('.')}: ${err.message}`)
-            .join(', '),
-        };
-        res.status(400).json(response);
-      } else {
-        const response: ApiResponse = {
-          success: false,
-          error: 'Validation failed',
-        };
-        res.status(400).json(response);
+          message: 'Validation failed',
+          errors: validationErrors,
+        });
       }
+
+      return res.status(500).json({
+        success: false,
+        message: 'Internal server error during validation',
+      });
     }
   };
 };
