@@ -3,6 +3,7 @@ import { apiClient, handleApiResponse } from "../lib/api-client";
 import { TeamResponse, TeamGenerationResponse } from "../types/team";
 import { useTeamStore } from "../store/teamStore";
 import { useEffect } from "react";
+import { showToast } from "../utils/toast";
 
 const teamApi = {
   getMyTeam: async (): Promise<TeamResponse> => {
@@ -53,30 +54,44 @@ export const useTeam = () => {
       setGenerating(true);
       clearError();
       resetPollCount();
+      showToast.loading("Generating your team... This may take a moment.");
     },
     onSuccess: () => {
+      showToast.success(
+        "Team generation started! Your team will be ready shortly."
+      );
       startPolling();
     },
     onError: (error: any) => {
-      setError(error.message);
+      const errorMessage = error.message || "Failed to generate team";
+      setError(errorMessage);
       setGenerating(false);
+      showToast.error(errorMessage);
     },
   });
 
   useEffect(() => {
     if (teamQuery.data) {
+      const wasGenerating = isGenerating;
       setTeamData(teamQuery.data);
       if (teamQuery.data.players.length > 0) {
+        if (wasGenerating) {
+          showToast.success("🎉 Your team has been generated successfully!");
+        }
         setGenerating(false);
         resetPollCount();
       }
       clearError();
     }
-  }, [teamQuery.data]);
+  }, [teamQuery.data, isGenerating]);
 
   useEffect(() => {
     if (teamQuery.error) {
-      setError(teamQuery.error.message);
+      const errorMessage = teamQuery.error.message;
+      setError(errorMessage);
+      if (!errorMessage.includes("Team not found")) {
+        showToast.error(errorMessage);
+      }
     }
   }, [teamQuery.error]);
 

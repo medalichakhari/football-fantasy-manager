@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { apiClient, handleApiResponse } from "../lib/api-client";
 import { AuthRequest, AuthResponse } from "../types/auth";
 import { useAuthStore } from "../store/authStore";
+import { showToast } from "../utils/toast";
 
 const authApi = {
   authenticate: async (credentials: AuthRequest): Promise<AuthResponse> => {
@@ -47,13 +48,18 @@ export const useAuth = () => {
       if (data.success && data.data) {
         login(data.data.token, data.data.user);
         queryClient.invalidateQueries();
+        showToast.success("Welcome back! Login successful.");
         navigate("/dashboard");
       } else {
-        setError(data.error || "Authentication failed");
+        const errorMessage = data.error || "Authentication failed";
+        setError(errorMessage);
+        showToast.error(errorMessage);
       }
     },
     onError: (error: Error) => {
-      setError(error.message);
+      const errorMessage = error.message || "Login failed. Please try again.";
+      setError(errorMessage);
+      showToast.error(errorMessage);
     },
     onSettled: () => {
       setLoading(false);
@@ -63,9 +69,18 @@ export const useAuth = () => {
   const forgotPasswordMutation = useMutation({
     mutationFn: authApi.forgotPassword,
     onSuccess: (data) => {
-      if (!data.success) {
-        throw new Error(data.error || "Failed to send reset email");
+      if (data.success) {
+        showToast.success("Password reset email sent! Check your inbox.");
+      } else {
+        const errorMessage = data.error || "Failed to send reset email";
+        showToast.error(errorMessage);
+        throw new Error(errorMessage);
       }
+    },
+    onError: (error: Error) => {
+      const errorMessage =
+        error.message || "Failed to send reset email. Please try again.";
+      showToast.error(errorMessage);
     },
   });
 
@@ -73,9 +88,20 @@ export const useAuth = () => {
     mutationFn: ({ token, password }: { token: string; password: string }) =>
       authApi.resetPassword(token, password),
     onSuccess: (data) => {
-      if (!data.success) {
-        throw new Error(data.error || "Failed to reset password");
+      if (data.success) {
+        showToast.success(
+          "Password reset successful! You can now login with your new password."
+        );
+      } else {
+        const errorMessage = data.error || "Failed to reset password";
+        showToast.error(errorMessage);
+        throw new Error(errorMessage);
       }
+    },
+    onError: (error: Error) => {
+      const errorMessage =
+        error.message || "Failed to reset password. Please try again.";
+      showToast.error(errorMessage);
     },
   });
 
@@ -90,6 +116,7 @@ export const useAuth = () => {
   const handleLogout = () => {
     logout();
     queryClient.clear();
+    showToast.success("You have been logged out successfully.");
     navigate("/login");
   };
 

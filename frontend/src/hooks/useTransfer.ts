@@ -9,6 +9,7 @@ import {
   BuyPlayerRequest,
   BuyPlayerResponse,
 } from "../types/transfer";
+import { showToast } from "../utils/toast";
 
 const transferApi = {
   getMarketListings: async (
@@ -93,6 +94,12 @@ export const useTransfer = () => {
       queryClient.invalidateQueries({ queryKey: ["userTransferListings"] });
       queryClient.invalidateQueries({ queryKey: ["transferMarket"] });
       queryClient.invalidateQueries({ queryKey: ["team"] });
+      showToast.success("Player listed for transfer successfully!");
+    },
+    onError: (error: Error) => {
+      const errorMessage =
+        error.message || "Failed to list player for transfer";
+      showToast.error(errorMessage);
     },
   });
 
@@ -102,6 +109,11 @@ export const useTransfer = () => {
       queryClient.invalidateQueries({ queryKey: ["transferMarket"] });
       queryClient.invalidateQueries({ queryKey: ["team"] });
       queryClient.invalidateQueries({ queryKey: ["userTransferListings"] });
+      showToast.success("Player purchased successfully! Welcome to your team!");
+    },
+    onError: (error: Error) => {
+      const errorMessage = error.message || "Failed to purchase player";
+      showToast.error(errorMessage);
     },
   });
 
@@ -110,6 +122,11 @@ export const useTransfer = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["userTransferListings"] });
       queryClient.invalidateQueries({ queryKey: ["transferMarket"] });
+      showToast.success("Transfer listing removed successfully!");
+    },
+    onError: (error: Error) => {
+      const errorMessage = error.message || "Failed to remove transfer listing";
+      showToast.error(errorMessage);
     },
   });
 

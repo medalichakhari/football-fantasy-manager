@@ -106,7 +106,6 @@ export default function LoginPage() {
               />
               {errors.email && (
                 <p className="text-sm text-red-600 flex items-center">
-                  <span className="mr-1">⚠️</span>
                   {errors.email.message}
                 </p>
               )}
@@ -133,7 +132,6 @@ export default function LoginPage() {
               />
               {errors.password && (
                 <p className="text-sm text-red-600 flex items-center">
-                  <span className="mr-1">⚠️</span>
                   {errors.password.message}
                 </p>
               )}
@@ -147,15 +145,6 @@ export default function LoginPage() {
                 >
                   Forgot your password?
                 </Link>
-              </div>
-            )}
-
-            {(errors.root || loginError) && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-600 flex items-center">
-                  <span className="mr-1">⚠️</span>
-                  {errors.root?.message || loginError}
-                </p>
               </div>
             )}
 
