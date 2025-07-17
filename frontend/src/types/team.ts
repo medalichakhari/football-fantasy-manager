@@ -36,6 +36,13 @@ export interface TeamResponse {
   players: UserPlayer[];
   budget: number;
   teamStats: TeamStats;
+  teamSizeValidation: {
+    isValid: boolean;
+    currentSize: number;
+    minSize: number;
+    maxSize: number;
+    message?: string;
+  };
 }
 
 export interface TeamStatsResponse extends TeamStats {
