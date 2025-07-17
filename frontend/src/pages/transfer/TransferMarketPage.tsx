@@ -14,6 +14,7 @@ import { Button } from "../../components/ui/button";
 import { LoadingState, ErrorState } from "../../components/ui/states";
 import { PlayerCard } from "../../components/player/PlayerCard";
 import { FilterPanel } from "../../components/transfer/FilterPanel";
+import { BuyPlayerDialog } from "../../components/transfer/BuyPlayerDialog";
 
 const TransferMarketPage: React.FC = () => {
   const [filters, setFilters] = useState<TransferMarketFilters>({
@@ -24,8 +25,15 @@ const TransferMarketPage: React.FC = () => {
   });
 
   const [showFilters, setShowFilters] = useState(false);
-  const { useMarketListings, buyPlayer, isBuyingPlayer, buyPlayerError } =
-    useTransfer();
+  const [buyDialog, setBuyDialog] = useState<{
+    isOpen: boolean;
+    listing: any | null;
+  }>({
+    isOpen: false,
+    listing: null,
+  });
+
+  const { useMarketListings, buyPlayer, isBuyingPlayer } = useTransfer();
   const { data: marketData, isLoading, error } = useMarketListings(filters);
 
   const handleFilterChange = useCallback(
@@ -44,8 +52,22 @@ const TransferMarketPage: React.FC = () => {
     []
   );
 
-  const handleBuyPlayer = (listingId: string) => {
-    buyPlayer({ transferListingId: listingId });
+  const handleBuyPlayer = (_listingId: string, listing: any) => {
+    setBuyDialog({
+      isOpen: true,
+      listing: listing,
+    });
+  };
+
+  const handleConfirmBuy = () => {
+    if (buyDialog.listing) {
+      buyPlayer({ transferListingId: buyDialog.listing.id });
+      setBuyDialog({ isOpen: false, listing: null });
+    }
+  };
+
+  const handleCloseBuyDialog = () => {
+    setBuyDialog({ isOpen: false, listing: null });
   };
 
   if (isLoading) {
@@ -132,7 +154,7 @@ const TransferMarketPage: React.FC = () => {
                       listing={listing}
                       actionButton={
                         <Button
-                          onClick={() => handleBuyPlayer(listing.id)}
+                          onClick={() => handleBuyPlayer(listing.id, listing)}
                           loading={isBuyingPlayer}
                           disabled={isBuyingPlayer}
                           className="bg-green-600 hover:bg-green-700"
@@ -147,6 +169,14 @@ const TransferMarketPage: React.FC = () => {
             )}
           </CardContent>
         </Card>
+
+        <BuyPlayerDialog
+          isOpen={buyDialog.isOpen}
+          onClose={handleCloseBuyDialog}
+          onConfirm={handleConfirmBuy}
+          player={buyDialog.listing?.player || null}
+          isLoading={isBuyingPlayer}
+        />
       </div>
     </div>
   );

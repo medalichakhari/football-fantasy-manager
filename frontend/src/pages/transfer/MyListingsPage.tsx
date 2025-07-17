@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Trash2, Plus } from "lucide-react";
 import { useTransfer } from "../../hooks/useTransfer";
@@ -12,8 +12,17 @@ import {
 } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { PlayerCard } from "../../components/player/PlayerCard";
+import { RemoveListingDialog } from "../../components/transfer/RemoveListingDialog";
 
 const MyListingsPage: React.FC = () => {
+  const [removeDialog, setRemoveDialog] = useState<{
+    isOpen: boolean;
+    listing: any | null;
+  }>({
+    isOpen: false,
+    listing: null,
+  });
+
   const {
     useUserListings,
     removeListing,
@@ -22,10 +31,22 @@ const MyListingsPage: React.FC = () => {
   } = useTransfer();
   const { data: listings, isLoading, error } = useUserListings();
 
-  const handleRemoveListing = (listingId: string) => {
-    if (window.confirm("Are you sure you want to remove this listing?")) {
-      removeListing(listingId);
+  const handleRemoveListing = (_listingId: string, listing: any) => {
+    setRemoveDialog({
+      isOpen: true,
+      listing: listing,
+    });
+  };
+
+  const handleConfirmRemove = () => {
+    if (removeDialog.listing) {
+      removeListing(removeDialog.listing.id);
+      setRemoveDialog({ isOpen: false, listing: null });
     }
+  };
+
+  const handleCloseRemoveDialog = () => {
+    setRemoveDialog({ isOpen: false, listing: null });
   };
 
   if (isLoading) {
@@ -128,7 +149,9 @@ const MyListingsPage: React.FC = () => {
                       actionButton={
                         <Button
                           variant="ghost"
-                          onClick={() => handleRemoveListing(listing.id)}
+                          onClick={() =>
+                            handleRemoveListing(listing.id, listing)
+                          }
                           disabled={isRemovingListing}
                           className="text-red-600 hover:text-red-700 hover:bg-red-50"
                         >
@@ -142,6 +165,14 @@ const MyListingsPage: React.FC = () => {
             )}
           </CardContent>
         </Card>
+
+        <RemoveListingDialog
+          isOpen={removeDialog.isOpen}
+          onClose={handleCloseRemoveDialog}
+          onConfirm={handleConfirmRemove}
+          player={removeDialog.listing?.player || null}
+          isLoading={isRemovingListing}
+        />
       </div>
     </div>
   );
