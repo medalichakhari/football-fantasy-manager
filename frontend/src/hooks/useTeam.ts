@@ -63,7 +63,10 @@ export const useTeam = () => {
       startPolling();
     },
     onError: (error: any) => {
-      const errorMessage = error.message || "Failed to generate team";
+      const errorMessage =
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to generate team";
       setError(errorMessage);
       setGenerating(false);
       showToast.error(errorMessage);

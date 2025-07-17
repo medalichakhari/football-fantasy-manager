@@ -96,9 +96,11 @@ export const useTransfer = () => {
       queryClient.invalidateQueries({ queryKey: ["team"] });
       showToast.success("Player listed for transfer successfully!");
     },
-    onError: (error: Error) => {
+    onError: (error: any) => {
       const errorMessage =
-        error.message || "Failed to list player for transfer";
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to list player for transfer";
       showToast.error(errorMessage);
     },
   });
@@ -111,8 +113,11 @@ export const useTransfer = () => {
       queryClient.invalidateQueries({ queryKey: ["userTransferListings"] });
       showToast.success("Player purchased successfully! Welcome to your team!");
     },
-    onError: (error: Error) => {
-      const errorMessage = error.message || "Failed to purchase player";
+    onError: (error: any) => {
+      const errorMessage =
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to purchase player";
       showToast.error(errorMessage);
     },
   });
@@ -124,8 +129,11 @@ export const useTransfer = () => {
       queryClient.invalidateQueries({ queryKey: ["transferMarket"] });
       showToast.success("Transfer listing removed successfully!");
     },
-    onError: (error: Error) => {
-      const errorMessage = error.message || "Failed to remove transfer listing";
+    onError: (error: any) => {
+      const errorMessage =
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to remove transfer listing";
       showToast.error(errorMessage);
     },
   });

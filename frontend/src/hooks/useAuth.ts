@@ -56,8 +56,11 @@ export const useAuth = () => {
         showToast.error(errorMessage);
       }
     },
-    onError: (error: Error) => {
-      const errorMessage = error.message || "Login failed. Please try again.";
+    onError: (error: any) => {
+      const errorMessage =
+        error?.response?.data?.error ||
+        error?.message ||
+        "Login failed. Please try again.";
       setError(errorMessage);
       showToast.error(errorMessage);
     },
@@ -77,9 +80,11 @@ export const useAuth = () => {
         throw new Error(errorMessage);
       }
     },
-    onError: (error: Error) => {
+    onError: (error: any) => {
       const errorMessage =
-        error.message || "Failed to send reset email. Please try again.";
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to send reset email. Please try again.";
       showToast.error(errorMessage);
     },
   });
@@ -98,9 +103,11 @@ export const useAuth = () => {
         throw new Error(errorMessage);
       }
     },
-    onError: (error: Error) => {
+    onError: (error: any) => {
       const errorMessage =
-        error.message || "Failed to reset password. Please try again.";
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to reset password. Please try again.";
       showToast.error(errorMessage);
     },
   });
