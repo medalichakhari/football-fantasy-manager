@@ -1,3 +1,5 @@
+import { Player } from "./team";
+
 export interface TransferListing {
   id: string;
   playerId: string;
@@ -47,16 +49,9 @@ export interface BuyPlayerRequest {
 }
 
 export interface BuyPlayerResponse {
-  success: boolean;
-  transfer: {
-    buyerId: string;
-    sellerId: string;
-    playerId: string;
-    price: number;
-    finalPrice: number;
-  };
-  updatedBudgets: {
-    buyer: number;
-    seller: number;
-  };
+  player: Player;
+  paidPrice: number;
+  originalPrice: number;
+  discountApplied: number;
+  newBudget: number;
 }

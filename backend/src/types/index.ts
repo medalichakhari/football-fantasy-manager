@@ -137,6 +137,8 @@ export interface TransferListingWithRelations extends TransferListing {
 
 export interface BuyPlayerResponse {
   player: Player;
-  price: number;
+  paidPrice: number;
+  originalPrice: number;
+  discountApplied: number;
   newBudget: number;
 }

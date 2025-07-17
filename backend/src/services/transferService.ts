@@ -146,8 +146,13 @@ export class TransferService {
         throw new Error('Buyer not found');
       }
 
-      if (buyer.budget < listing.price) {
-        throw new Error('Insufficient budget');
+      const discountedPrice = Math.floor(listing.price * 0.95);
+      const sellerReceives = discountedPrice;
+
+      if (buyer.budget < discountedPrice) {
+        throw new Error(
+          `Insufficient budget. You need ${discountedPrice.toLocaleString()} but only have ${buyer.budget.toLocaleString()}`
+        );
       }
 
       await tx.userPlayer.delete({
@@ -163,28 +168,28 @@ export class TransferService {
         data: {
           userId,
           playerId: listing.playerId,
-          price: listing.price,
+          price: discountedPrice,
         },
       });
 
       await tx.user.update({
         where: { id: userId },
         data: {
-          budget: buyer.budget - listing.price,
+          budget: buyer.budget - discountedPrice,
         },
       });
 
       await tx.user.update({
         where: { id: listing.sellerId },
         data: {
-          budget: listing.seller.budget + listing.price,
+          budget: listing.seller.budget + sellerReceives,
         },
       });
 
       await tx.player.update({
         where: { id: listing.playerId },
         data: {
-          price: listing.price,
+          price: discountedPrice,
         },
       });
 
@@ -196,10 +201,12 @@ export class TransferService {
       return {
         player: {
           ...listing.player,
-          price: listing.price,
+          price: discountedPrice,
         },
-        price: listing.price,
-        newBudget: buyer.budget - listing.price,
+        paidPrice: discountedPrice,
+        originalPrice: listing.price,
+        discountApplied: listing.price - discountedPrice,
+        newBudget: buyer.budget - discountedPrice,
       };
     });
   }
