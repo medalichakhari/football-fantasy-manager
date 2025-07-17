@@ -53,6 +53,13 @@ export interface TeamResponse {
     totalPlayers: number;
     totalValue?: number;
   };
+  teamSizeValidation: {
+    isValid: boolean;
+    currentSize: number;
+    minSize: number;
+    maxSize: number;
+    message?: string;
+  };
 }
 
 export interface TransferMarketResponse {
@@ -104,6 +111,8 @@ export const TEAM_REQUIREMENTS = {
   MIDFIELDERS: 6,
   ATTACKERS: 5,
   TOTAL: 20,
+  MIN_SQUAD_SIZE: 15,
+  MAX_SQUAD_SIZE: 25,
 } as const;
 
 export const INITIAL_BUDGET = 5000000;

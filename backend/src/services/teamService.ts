@@ -7,6 +7,7 @@ import {
   TeamGenerationResponse,
   Player,
 } from '../types/index';
+import { validateTeamSize } from '../utils/teamValidation';
 
 export class TeamService {
   private teamGenerationJob: TeamGenerationJob;
@@ -37,10 +38,14 @@ export class TeamService {
       userPlayers.map(up => up.player),
       userPlayers
     );
+
+    const teamSizeValidation = await validateTeamSize(userId);
+
     return {
       players: userPlayers,
       budget: user.budget,
       teamStats,
+      teamSizeValidation,
     };
   }
 
