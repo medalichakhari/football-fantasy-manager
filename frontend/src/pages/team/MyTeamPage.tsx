@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useTeam } from "../../hooks/useTeam";
 import { useAuthStore } from "../../store/authStore";
 import { LoadingState, ErrorState } from "../../components/ui/states";
-import { TeamGenerationStatus } from "../../components/team/TeamGenerationStatus";
 import { TeamStatsCards } from "../../components/team/TeamStats";
 import { PositionSection } from "../../components/team/PositionSection";
 import { PlayersByPosition } from "../../types/team";
@@ -28,14 +27,7 @@ const groupPlayersByPosition = (players: any[]): PlayersByPosition => {
 
 export default function MyTeamPage() {
   const { isAuthenticated } = useAuthStore();
-  const {
-    teamData,
-    isLoadingTeam,
-    isGenerating,
-    generateTeam,
-    refetchTeam,
-    teamError,
-  } = useTeam();
+  const { teamData, isLoadingTeam, refetchTeam, teamError } = useTeam();
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -54,9 +46,9 @@ export default function MyTeamPage() {
 
   if (teamError && teamError.includes("Team not found")) {
     return (
-      <TeamGenerationStatus
-        onGenerateTeam={generateTeam}
-        isGenerating={isGenerating}
+      <LoadingState
+        title="Setting up your team..."
+        description="Your team is being generated automatically. This may take a few moments."
       />
     );
   }
@@ -73,9 +65,9 @@ export default function MyTeamPage() {
 
   if (!teamData || teamData.players.length === 0) {
     return (
-      <TeamGenerationStatus
-        onGenerateTeam={generateTeam}
-        isGenerating={isGenerating}
+      <LoadingState
+        title="Setting up your team..."
+        description="Your team is being generated automatically. This may take a few moments."
       />
     );
   }

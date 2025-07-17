@@ -14,7 +14,6 @@ export default function Navigation() {
     { path: "/", label: "Home" },
     ...(isAuthenticated
       ? [
-          { path: "/dashboard", label: "Dashboard" },
           { path: "/my-team", label: "My Team" },
           { path: "/transfers", label: "Transfers" },
         ]

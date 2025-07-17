@@ -5,18 +5,21 @@ export default function HomePage() {
   const features = [
     {
       icon: <Users className="h-6 w-6" />,
-      title: "Build Your Team",
-      description: "Select players to create your fantasy squad",
+      title: "Team Management",
+      description:
+        "Receive your team automatically upon registration with $5M budget and 20 players",
     },
     {
       icon: <TrendingUp className="h-6 w-6" />,
       title: "Transfer Market",
-      description: "Buy and sell players to improve your team",
+      description:
+        "Buy players at 95% of asking price, filter by team, player name, and price",
     },
     {
       icon: <Trophy className="h-6 w-6" />,
-      title: "Compete & Win",
-      description: "Compete in leagues and climb leaderboards",
+      title: "Squad Rules",
+      description:
+        "Maintain 15-25 players, list your own players for sale at custom prices",
     },
   ];
 
@@ -34,7 +37,7 @@ export default function HomePage() {
 
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             Build your dream team, manage transfers, and compete with other
-            managers
+            managers in this fantasy football experience
           </p>
 
           <Link

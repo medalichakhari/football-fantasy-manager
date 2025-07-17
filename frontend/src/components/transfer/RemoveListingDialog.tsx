@@ -1,6 +1,5 @@
 import React from "react";
 import { ConfirmDialog } from "../ui/dialog";
-import { formatCurrency } from "../../utils";
 
 interface RemoveListingDialogProps {
   isOpen: boolean;

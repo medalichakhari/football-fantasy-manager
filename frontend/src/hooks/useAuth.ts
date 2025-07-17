@@ -49,7 +49,7 @@ export const useAuth = () => {
         login(data.data.token, data.data.user);
         queryClient.invalidateQueries();
         showToast.success("Welcome back! Login successful.");
-        navigate("/dashboard");
+        navigate("/my-team");
       } else {
         const errorMessage = data.error || "Authentication failed";
         setError(errorMessage);

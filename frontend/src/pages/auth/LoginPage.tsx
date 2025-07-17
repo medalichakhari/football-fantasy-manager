@@ -46,7 +46,7 @@ export default function LoginPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/dashboard");
+      navigate("/my-team");
     }
   }, [isAuthenticated, navigate]);
 

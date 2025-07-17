@@ -7,6 +7,7 @@ interface StatsCardProps {
   value: string | number;
   icon: React.ComponentType<{ className?: string }>;
   iconColor: string;
+  subtitle?: string;
   className?: string;
 }
 
@@ -15,6 +16,7 @@ const StatsCard = ({
   value,
   icon: Icon,
   iconColor,
+  subtitle,
   className,
 }: StatsCardProps) => (
   <div
@@ -30,6 +32,7 @@ const StatsCard = ({
       <div className="ml-4">
         <p className="text-sm font-medium text-gray-600">{title}</p>
         <p className="text-2xl font-bold text-gray-900">{value}</p>
+        {subtitle && <p className="text-xs text-gray-500 mt-1">{subtitle}</p>}
       </div>
     </div>
   </div>
@@ -58,6 +61,7 @@ export const TeamStatsCards = ({
       <StatsCard
         title="Total Players"
         value={stats.totalPlayers}
+        subtitle="Required: 15-25 players"
         icon={Users}
         iconColor="bg-blue-100 text-blue-600"
       />
