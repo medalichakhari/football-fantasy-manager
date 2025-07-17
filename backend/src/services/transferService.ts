@@ -7,6 +7,7 @@ import {
   TransferListingWithRelations,
   BuyPlayerResponse,
 } from '../types/index';
+import { canSellPlayer, canBuyPlayer } from '../utils/teamValidation';
 
 export class TransferService {
   async getMarketListings(filters: TransferMarketFilters): Promise<TransferMarketResponse> {
@@ -67,6 +68,11 @@ export class TransferService {
   ): Promise<TransferListingWithRelations> {
     const { playerId, price } = data;
 
+    const sellValidation = await canSellPlayer(userId);
+    if (!sellValidation.canSell) {
+      throw new Error(sellValidation.message || 'Cannot sell player due to team size constraints');
+    }
+
     const userPlayer = await prisma.userPlayer.findFirst({
       where: {
         userId,
@@ -120,6 +126,11 @@ export class TransferService {
 
   async buyPlayer(userId: string, data: BuyPlayerRequest): Promise<BuyPlayerResponse> {
     const { transferListingId } = data;
+
+    const buyValidation = await canBuyPlayer(userId);
+    if (!buyValidation.canBuy) {
+      throw new Error(buyValidation.message || 'Cannot buy player due to team size constraints');
+    }
 
     return await prisma.$transaction(async tx => {
       const listing = await tx.transferListing.findUnique({
