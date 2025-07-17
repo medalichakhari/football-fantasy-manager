@@ -16,6 +16,7 @@ import { Input } from "../../components/ui/input";
 import { PlayerCard } from "../../components/player/PlayerCard";
 import { PlayerAvatar } from "../../components/ui/player-avatar";
 import { PositionBadge } from "../../components/ui/position-badge";
+import { formatCurrency } from "../../utils";
 
 const SellPlayerPage: React.FC = () => {
   const navigate = useNavigate();
@@ -52,14 +53,6 @@ const SellPlayerPage: React.FC = () => {
     } catch (err) {
       // Error is handled by the hook
     }
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 0,
-    }).format(price);
   };
 
   if (isLoadingTeam) {
@@ -186,7 +179,7 @@ const SellPlayerPage: React.FC = () => {
                           </div>
                           <div className="text-sm text-gray-500">
                             Market Value:{" "}
-                            {formatPrice(selectedPlayer.player.price)}
+                            {formatCurrency(selectedPlayer.player.price)}
                           </div>
                         </div>
                       </div>
@@ -216,11 +209,32 @@ const SellPlayerPage: React.FC = () => {
                     </div>
                     <p className="mt-2 text-sm text-gray-500">
                       Suggested range:{" "}
-                      {formatPrice(
+                      {formatCurrency(
                         Math.max(1, selectedPlayer.player.price * 0.8)
                       )}{" "}
-                      - {formatPrice(selectedPlayer.player.price * 1.2)}
+                      - {formatCurrency(selectedPlayer.player.price * 1.2)}
                     </p>
+                    {listingPrice && parseFloat(listingPrice) > 0 && (
+                      <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-gray-600">Listing Price:</span>
+                          <span className="font-medium">
+                            {formatCurrency(parseFloat(listingPrice))}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm mt-1">
+                          <span className="text-gray-600">You'll receive:</span>
+                          <span className="font-bold text-green-600">
+                            {formatCurrency(
+                              Math.floor(parseFloat(listingPrice) * 0.95)
+                            )}
+                          </span>
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          * 5% transfer fee applies to all sales
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {(error || createListingError) && (

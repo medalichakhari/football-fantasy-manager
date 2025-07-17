@@ -107,11 +107,13 @@ export const useTransfer = () => {
 
   const buyPlayerMutation = useMutation({
     mutationFn: transferApi.buyPlayer,
-    onSuccess: () => {
+    onSuccess: (data: BuyPlayerResponse) => {
       queryClient.invalidateQueries({ queryKey: ["transferMarket"] });
       queryClient.invalidateQueries({ queryKey: ["team"] });
       queryClient.invalidateQueries({ queryKey: ["userTransferListings"] });
-      showToast.success("Player purchased successfully! Welcome to your team!");
+
+      const successMessage = `${data.player.name} purchased successfully! You paid`;
+      showToast.success(successMessage);
     },
     onError: (error: any) => {
       const errorMessage =

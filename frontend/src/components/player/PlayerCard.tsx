@@ -3,6 +3,7 @@ import { Card, CardContent } from "../ui/card";
 import { PlayerAvatar } from "../ui/player-avatar";
 import { PositionBadge } from "../ui/position-badge";
 import { cn } from "../../utils";
+import { formatCurrency } from "../../utils";
 
 interface PlayerCardProps {
   player: {
@@ -27,6 +28,7 @@ interface PlayerCardProps {
   onClick?: () => void;
   selected?: boolean;
   className?: string;
+  showSellerView?: boolean;
 }
 
 export const PlayerCard: React.FC<PlayerCardProps> = ({
@@ -36,15 +38,8 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
   onClick,
   selected,
   className,
+  showSellerView = false,
 }) => {
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 0,
-    }).format(price);
-  };
-
   const displayPrice = listing?.price || player.price;
 
   return (
@@ -118,11 +113,32 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
           <div className="flex items-center space-x-4 flex-shrink-0">
             <div className="text-right">
               <div className="text-xl font-bold text-gray-900">
-                {formatPrice(displayPrice)}
+                {formatCurrency(displayPrice)}
               </div>
+              {listing && !showSellerView && (
+                <div className="space-y-1">
+                  <div className="text-sm text-green-600 font-medium">
+                    You pay: {formatCurrency(Math.floor(displayPrice * 0.95))}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    (5% transfer discount applied)
+                  </div>
+                </div>
+              )}
+              {listing && showSellerView && (
+                <div className="space-y-1">
+                  <div className="text-sm text-blue-600 font-medium">
+                    You'll receive:{" "}
+                    {formatCurrency(Math.floor(displayPrice * 0.95))}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    (5% transfer fee deducted)
+                  </div>
+                </div>
+              )}
               {listing && listing.price !== player.price && (
                 <div className="text-sm text-gray-500">
-                  Market value: {formatPrice(player.price)}
+                  Market value: {formatCurrency(player.price)}
                 </div>
               )}
             </div>

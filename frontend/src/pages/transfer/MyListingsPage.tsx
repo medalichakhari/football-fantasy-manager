@@ -124,6 +124,7 @@ const MyListingsPage: React.FC = () => {
                     <PlayerCard
                       player={listing.player}
                       listing={listing}
+                      showSellerView={true}
                       actionButton={
                         <Button
                           variant="ghost"
