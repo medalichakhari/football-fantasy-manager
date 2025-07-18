@@ -30,9 +30,16 @@ const transferApi = {
     return handleApiResponse(response).data!;
   },
 
-  getUserListings: async (): Promise<TransferListing[]> => {
-    const response = await apiClient.get<ApiResponse<TransferListing[]>>(
-      "/transfer/my-listings"
+  getUserListings: async (
+    page: number = 1,
+    limit: number = 6
+  ): Promise<TransferMarketResponse> => {
+    const params = new URLSearchParams();
+    params.append("page", page.toString());
+    params.append("limit", limit.toString());
+
+    const response = await apiClient.get<ApiResponse<TransferMarketResponse>>(
+      `/transfer/my-listings?${params}`
     );
     return handleApiResponse(response).data!;
   },
@@ -80,10 +87,10 @@ export const useTransfer = () => {
     });
   };
 
-  const useUserListings = () => {
+  const useUserListings = (page: number = 1, limit: number = 6) => {
     return useQuery({
-      queryKey: ["userTransferListings"],
-      queryFn: transferApi.getUserListings,
+      queryKey: ["userTransferListings", page, limit],
+      queryFn: () => transferApi.getUserListings(page, limit),
       staleTime: 1 * 60 * 1000,
     });
   };
