@@ -15,6 +15,7 @@ import { LoadingState, ErrorState } from "../../components/ui/states";
 import { PlayerCard } from "../../components/player/PlayerCard";
 import { FilterPanel } from "../../components/transfer/FilterPanel";
 import { BuyPlayerDialog } from "../../components/transfer/BuyPlayerDialog";
+import { Pagination } from "../../components/ui/pagination";
 
 const TransferMarketPage: React.FC = () => {
   const [filters, setFilters] = useState<TransferMarketFilters>({
@@ -22,6 +23,8 @@ const TransferMarketPage: React.FC = () => {
     minPrice: undefined,
     maxPrice: undefined,
     search: "",
+    page: 1,
+    limit: 6,
   });
 
   const [showFilters, setShowFilters] = useState(false);
@@ -34,7 +37,12 @@ const TransferMarketPage: React.FC = () => {
   });
 
   const { useMarketListings, buyPlayer, isBuyingPlayer } = useTransfer();
-  const { data: marketData, isLoading, error } = useMarketListings(filters);
+  const {
+    data: marketData,
+    isLoading,
+    error,
+    isFetching,
+  } = useMarketListings(filters);
 
   const handleFilterChange = useCallback(
     (key: keyof TransferMarketFilters, value: string) => {
@@ -51,6 +59,13 @@ const TransferMarketPage: React.FC = () => {
     },
     []
   );
+
+  const handlePageChange = useCallback((page: number) => {
+    setFilters((prev: TransferMarketFilters) => ({
+      ...prev,
+      page,
+    }));
+  }, []);
 
   const handleBuyPlayer = (_listingId: string, listing: any) => {
     setBuyDialog({
@@ -168,6 +183,22 @@ const TransferMarketPage: React.FC = () => {
               </div>
             )}
           </CardContent>
+
+          {marketData && marketData.totalCount > 0 && (
+            <div
+              className={`${
+                isFetching ? "opacity-50 pointer-events-none" : ""
+              }`}
+            >
+              <Pagination
+                currentPage={filters.page || 1}
+                totalCount={marketData.totalCount}
+                pageSize={filters.limit || 6}
+                onPageChange={handlePageChange}
+                showInfo={true}
+              />
+            </div>
+          )}
         </Card>
 
         <BuyPlayerDialog

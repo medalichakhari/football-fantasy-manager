@@ -75,11 +75,20 @@ export const useTransfer = () => {
 
   const useMarketListings = (filters: TransferMarketFilters) => {
     return useQuery({
-      queryKey: ["transferMarket", filters],
+      queryKey: [
+        "transferMarket",
+        filters.position,
+        filters.search,
+        filters.minPrice,
+        filters.maxPrice,
+        filters.page,
+        filters.limit,
+      ],
       queryFn: () => transferApi.getMarketListings(filters),
       staleTime: 30 * 1000, // 30 seconds
       gcTime: 5 * 60 * 1000, // 5 minutes
       refetchOnWindowFocus: false,
+      placeholderData: (previousData) => previousData,
       enabled:
         Object.values(filters).some(
           (value) => value !== undefined && value !== "" && value !== null
@@ -92,6 +101,7 @@ export const useTransfer = () => {
       queryKey: ["userTransferListings", page, limit],
       queryFn: () => transferApi.getUserListings(page, limit),
       staleTime: 1 * 60 * 1000,
+      placeholderData: (previousData) => previousData,
     });
   };
 
