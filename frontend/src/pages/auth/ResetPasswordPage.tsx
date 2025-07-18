@@ -171,11 +171,13 @@ export default function ResetPasswordPage() {
                   placeholder="Enter new password"
                   {...register("password")}
                   className={errors.password ? "border-red-500 pr-10" : "pr-10"}
+                  disabled={isResettingPassword}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  disabled={isResettingPassword}
                 >
                   {showPassword ? (
                     <EyeOff className="h-4 w-4 text-gray-400" />
@@ -202,11 +204,13 @@ export default function ResetPasswordPage() {
                   className={
                     errors.confirmPassword ? "border-red-500 pr-10" : "pr-10"
                   }
+                  disabled={isResettingPassword}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  disabled={isResettingPassword}
                 >
                   {showConfirmPassword ? (
                     <EyeOff className="h-4 w-4 text-gray-400" />
@@ -224,10 +228,11 @@ export default function ResetPasswordPage() {
 
             <Button
               type="submit"
+              loading={isResettingPassword}
               disabled={isResettingPassword}
               className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:scale-105 transition-all duration-200"
             >
-              {isResettingPassword ? "Resetting..." : "Reset Password"}
+              Reset Password
             </Button>
           </form>
 

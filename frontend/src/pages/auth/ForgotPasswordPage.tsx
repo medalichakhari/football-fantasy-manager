@@ -104,6 +104,7 @@ export default function ForgotPasswordPage() {
                 placeholder="Enter your email"
                 {...register("email")}
                 className={errors.email ? "border-red-500" : ""}
+                disabled={isSendingResetEmail}
               />
               {errors.email && (
                 <p className="text-sm text-red-600">{errors.email.message}</p>
@@ -112,10 +113,11 @@ export default function ForgotPasswordPage() {
 
             <Button
               type="submit"
+              loading={isSendingResetEmail}
               disabled={isSendingResetEmail}
               className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:scale-105 transition-all duration-200"
             >
-              {isSendingResetEmail ? "Sending..." : "Send Reset Link"}
+              Send Reset Link
             </Button>
           </form>
 

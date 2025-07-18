@@ -20,7 +20,6 @@ export class EmailService {
   }
 
   private createTransporter(): nodemailer.Transporter {
-    if (process.env.NODE_ENV === 'production') {
       return nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: parseInt(process.env.SMTP_PORT || '587'),
@@ -30,17 +29,6 @@ export class EmailService {
           pass: process.env.SMTP_PASS,
         },
       });
-    } else {
-      return nodemailer.createTransport({
-        host: 'smtp.ethereal.email',
-        port: 587,
-        secure: false,
-        auth: {
-          user: process.env.ETHEREAL_USER || 'ethereal.user@ethereal.email',
-          pass: process.env.ETHEREAL_PASS || 'ethereal.pass',
-        },
-      });
-    }
   }
 
   private async loadTemplate(templateName: string): Promise<string> {

@@ -71,6 +71,10 @@ export const useAuth = () => {
 
   const forgotPasswordMutation = useMutation({
     mutationFn: authApi.forgotPassword,
+    onMutate: () => {
+      setLoading(true);
+      clearError();
+    },
     onSuccess: (data) => {
       if (data.success) {
         showToast.success("Password reset email sent! Check your inbox.");
@@ -87,11 +91,18 @@ export const useAuth = () => {
         "Failed to send reset email. Please try again.";
       showToast.error(errorMessage);
     },
+    onSettled: () => {
+      setLoading(false);
+    },
   });
 
   const resetPasswordMutation = useMutation({
     mutationFn: ({ token, password }: { token: string; password: string }) =>
       authApi.resetPassword(token, password),
+    onMutate: () => {
+      setLoading(true);
+      clearError();
+    },
     onSuccess: (data) => {
       if (data.success) {
         showToast.success(
@@ -109,6 +120,9 @@ export const useAuth = () => {
         error?.message ||
         "Failed to reset password. Please try again.";
       showToast.error(errorMessage);
+    },
+    onSettled: () => {
+      setLoading(false);
     },
   });
 
@@ -128,10 +142,10 @@ export const useAuth = () => {
   };
 
   return {
-    login: loginMutation.mutate,
+    login: loginMutation.mutateAsync,
     logout: handleLogout,
-    forgotPassword: forgotPasswordMutation.mutate,
-    resetPassword: resetPasswordMutation.mutate,
+    forgotPassword: forgotPasswordMutation.mutateAsync,
+    resetPassword: resetPasswordMutation.mutateAsync,
 
     isLoggingIn: loginMutation.isPending,
     isSendingResetEmail: forgotPasswordMutation.isPending,
