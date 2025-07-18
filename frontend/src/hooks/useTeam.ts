@@ -25,16 +25,8 @@ const teamApi = {
 
 export const useTeam = () => {
   const queryClient = useQueryClient();
-  const {
-    setTeamData,
-    setError,
-    setGenerating,
-    incrementPollCount,
-    resetPollCount,
-    clearError,
-    pollCount,
-    isGenerating,
-  } = useTeamStore();
+  const { setTeamData, setError, setGenerating, clearError, isGenerating } =
+    useTeamStore();
 
   const teamQuery = useQuery({
     queryKey: ["team"],
@@ -53,14 +45,11 @@ export const useTeam = () => {
     onMutate: () => {
       setGenerating(true);
       clearError();
-      resetPollCount();
       showToast.loading("Generating your team... This may take a moment.");
     },
     onSuccess: () => {
-      showToast.success(
-        "Team generation started! Your team will be ready shortly."
-      );
-      startPolling();
+      showToast.success("Team generated successfully!");
+      queryClient.invalidateQueries({ queryKey: ["team"] });
     },
     onError: (error: any) => {
       const errorMessage =
@@ -82,7 +71,6 @@ export const useTeam = () => {
           showToast.success("🎉 Your team has been generated successfully!");
         }
         setGenerating(false);
-        resetPollCount();
       }
       clearError();
     }
@@ -97,20 +85,6 @@ export const useTeam = () => {
       }
     }
   }, [teamQuery.error]);
-
-  const startPolling = () => {
-    const pollInterval = setInterval(() => {
-      queryClient.invalidateQueries({ queryKey: ["team"] });
-      incrementPollCount();
-
-      if (pollCount >= 20) {
-        clearInterval(pollInterval);
-        setGenerating(false);
-      }
-    }, 3000);
-
-    return pollInterval;
-  };
 
   return {
     teamData: teamQuery.data,

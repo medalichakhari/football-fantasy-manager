@@ -7,7 +7,6 @@ interface TeamState {
   isLoading: boolean;
   error: string | null;
   isGenerating: boolean;
-  pollCount: number;
 }
 
 interface TeamActions {
@@ -15,8 +14,6 @@ interface TeamActions {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   setGenerating: (generating: boolean) => void;
-  incrementPollCount: () => void;
-  resetPollCount: () => void;
   clearError: () => void;
 }
 
@@ -24,13 +21,12 @@ export type TeamStore = TeamState & TeamActions;
 
 export const useTeamStore = create<TeamStore>()(
   devtools(
-    (set, get) => ({
+    (set) => ({
       // State
       teamData: null,
       isLoading: false,
       error: null,
       isGenerating: false,
-      pollCount: 0,
 
       // Actions
       setTeamData: (teamData: TeamResponse | null) => {
@@ -47,14 +43,6 @@ export const useTeamStore = create<TeamStore>()(
 
       setGenerating: (isGenerating: boolean) => {
         set({ isGenerating });
-      },
-
-      incrementPollCount: () => {
-        set({ pollCount: get().pollCount + 1 });
-      },
-
-      resetPollCount: () => {
-        set({ pollCount: 0 });
       },
 
       clearError: () => {
