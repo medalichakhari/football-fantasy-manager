@@ -20,15 +20,15 @@ export class EmailService {
   }
 
   private createTransporter(): nodemailer.Transporter {
-      return nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: parseInt(process.env.SMTP_PORT || '587'),
-        secure: process.env.SMTP_SECURE === 'true',
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
-        },
-      });
+    return nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT || '587'),
+      secure: process.env.SMTP_SECURE === 'true',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
   }
 
   private async loadTemplate(templateName: string): Promise<string> {
@@ -139,6 +139,28 @@ export class EmailService {
         title: 'Your Team is Ready!',
         userName,
         teamUrl,
+      },
+    });
+  }
+
+  async sendPlayerSoldEmail(
+    sellerEmail: string,
+    sellerName: string,
+    playerName: string,
+    soldPrice: number
+  ): Promise<boolean> {
+    const transfersUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/transfers`;
+
+    return this.sendEmail({
+      to: sellerEmail,
+      subject: `Your player ${playerName} has been sold!`,
+      template: 'player-sold',
+      data: {
+        title: 'Player Sold Successfully!',
+        sellerName,
+        playerName,
+        soldPrice: soldPrice.toLocaleString(),
+        transfersUrl,
       },
     });
   }

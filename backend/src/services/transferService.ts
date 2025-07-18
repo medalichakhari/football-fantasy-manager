@@ -8,8 +8,15 @@ import {
   BuyPlayerResponse,
 } from '../types/index';
 import { canSellPlayer, canBuyPlayer } from '../utils/teamValidation';
+import { EmailService } from './emailService';
 
 export class TransferService {
+  private emailService: EmailService;
+
+  constructor() {
+    this.emailService = new EmailService();
+  }
+
   async getMarketListings(filters: TransferMarketFilters): Promise<TransferMarketResponse> {
     const { position, minPrice, maxPrice, search, page = 1, limit = 20 } = filters;
 
@@ -209,7 +216,7 @@ export class TransferService {
         data: { isActive: false },
       });
 
-      return {
+      const result = {
         player: {
           ...listing.player,
           price: discountedPrice,
@@ -219,6 +226,19 @@ export class TransferService {
         discountApplied: listing.price - discountedPrice,
         newBudget: buyer.budget - discountedPrice,
       };
+
+      this.emailService
+        .sendPlayerSoldEmail(
+          listing.seller.email,
+          listing.seller.email.split('@')[0],
+          listing.player.name,
+          discountedPrice
+        )
+        .catch(error => {
+          console.error('Failed to send player sold email:', error);
+        });
+
+      return result;
     });
   }
 

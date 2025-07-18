@@ -1,0 +1,37 @@
+<div
+  style='padding: 30px 20px; background: linear-gradient(135deg, #10b981, #059669); color: white; text-align: center; border-radius: 8px 8px 0 0; margin-bottom: 20px;'
+>
+  <h1 style='margin: 0; font-size: 24px; font-weight: bold;'>Player Sold!</h1>
+</div>
+
+<div style='padding: 0 20px;'>
+  <h2 style='color: #1f2937; margin-bottom: 15px;'>Hello {{sellerName}}!</h2>
+
+  <p style='color: #4b5563; font-size: 16px; line-height: 1.6; margin-bottom: 20px;'>
+    Your player
+    <strong>{{playerName}}</strong>
+    has been sold for
+    <strong style='color: #10b981;'>${{soldPrice}}</strong>.
+  </p>
+
+  <div
+    style='background: #f0f9ff; border-left: 4px solid #10b981; padding: 20px; border-radius: 6px; margin: 20px 0;'
+  >
+    <p style='margin: 0; color: #1f2937; font-size: 14px;'>
+      The sale amount has been added to your account balance.
+    </p>
+  </div>
+
+  <p style='color: #4b5563; font-size: 14px; margin: 20px 0;'>
+    Good luck with your future transfers!
+  </p>
+
+  <div style='text-align: center; margin: 25px 0;'>
+    <a
+      href='{{transfersUrl}}'
+      style='display: inline-block; background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 500;'
+    >
+      View Transfer Market
+    </a>
+  </div>
+</div>
