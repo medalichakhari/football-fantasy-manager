@@ -21,12 +21,27 @@ import { formatCurrency } from "../../utils";
 const SellPlayerPage: React.FC = () => {
   const navigate = useNavigate();
   const { teamData, isLoadingTeam } = useTeam();
-  const { createListing, isCreatingListing, createListingError } =
-    useTransfer();
+  const {
+    createListing,
+    isCreatingListing,
+    createListingError,
+    useUserListings,
+  } = useTransfer();
+
+  const { data: userListings, isLoading: isLoadingListings } =
+    useUserListings();
 
   const [selectedPlayer, setSelectedPlayer] = useState<any>(null);
   const [listingPrice, setListingPrice] = useState<string>("");
   const [error, setError] = useState<string>("");
+
+  const availablePlayersToSell =
+    teamData?.players?.filter((userPlayer) => {
+      const isAlreadyListed = userListings?.some(
+        (listing) => listing.player.id === userPlayer.player.id
+      );
+      return !isAlreadyListed;
+    }) || [];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,7 +70,7 @@ const SellPlayerPage: React.FC = () => {
     }
   };
 
-  if (isLoadingTeam) {
+  if (isLoadingTeam || isLoadingListings) {
     return (
       <LoadingState
         title="Loading your team..."
@@ -64,7 +79,7 @@ const SellPlayerPage: React.FC = () => {
     );
   }
 
-  if (!teamData || !teamData.players || teamData.players.length === 0) {
+  if (!teamData || !teamData.players || availablePlayersToSell.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -96,10 +111,12 @@ const SellPlayerPage: React.FC = () => {
                 </svg>
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                No Players to Sell
+                No Players Available to Sell
               </h2>
               <p className="text-gray-600 mb-6">
-                You don't have any players in your team to list for sale.
+                {teamData?.players?.length === 0
+                  ? "You don't have any players in your team to list for sale."
+                  : "All your players are already listed for sale or not available for transfer."}
               </p>
               <Link
                 to="/transfers"
@@ -140,7 +157,7 @@ const SellPlayerPage: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-3 max-h-96 overflow-y-auto">
-                {teamData.players.map((userPlayer) => (
+                {availablePlayersToSell.map((userPlayer) => (
                   <PlayerCard
                     key={userPlayer.id}
                     player={userPlayer.player}
@@ -149,6 +166,13 @@ const SellPlayerPage: React.FC = () => {
                     className="cursor-pointer"
                   />
                 ))}
+                {availablePlayersToSell.length === 0 && (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500">
+                      All your players are already listed for sale
+                    </p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

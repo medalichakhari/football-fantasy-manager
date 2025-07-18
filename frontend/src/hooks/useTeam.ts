@@ -45,11 +45,13 @@ export const useTeam = () => {
     onMutate: () => {
       setGenerating(true);
       clearError();
-      showToast.loading("Generating your team... This may take a moment.");
     },
     onSuccess: () => {
+      showToast.dismissAll();
       showToast.success("Team generated successfully!");
       queryClient.invalidateQueries({ queryKey: ["team"] });
+      setGenerating(false);
+      setTeamData;
     },
     onError: (error: any) => {
       const errorMessage =
@@ -58,33 +60,20 @@ export const useTeam = () => {
         "Failed to generate team";
       setError(errorMessage);
       setGenerating(false);
+      showToast.dismissAll();
       showToast.error(errorMessage);
     },
   });
 
   useEffect(() => {
     if (teamQuery.data) {
-      const wasGenerating = isGenerating;
       setTeamData(teamQuery.data);
       if (teamQuery.data.players.length > 0) {
-        if (wasGenerating) {
-          showToast.success("🎉 Your team has been generated successfully!");
-        }
         setGenerating(false);
       }
       clearError();
     }
   }, [teamQuery.data, isGenerating]);
-
-  useEffect(() => {
-    if (teamQuery.error) {
-      const errorMessage = teamQuery.error.message;
-      setError(errorMessage);
-      if (!errorMessage.includes("Team not found")) {
-        showToast.error(errorMessage);
-      }
-    }
-  }, [teamQuery.error]);
 
   return {
     teamData: teamQuery.data,
@@ -97,7 +86,5 @@ export const useTeam = () => {
 
     teamError: teamQuery.error?.message,
     generateError: generateTeamMutation.error?.message,
-
-    isGeneratingTeam: generateTeamMutation.isPending,
   };
 };

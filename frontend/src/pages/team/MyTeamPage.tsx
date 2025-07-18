@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useTeam } from "../../hooks/useTeam";
 import { useAuthStore } from "../../store/authStore";
 import { LoadingState, ErrorState } from "../../components/ui/states";
@@ -33,8 +33,11 @@ export default function MyTeamPage() {
     refetchTeam,
     teamError,
     generateTeam,
-    isGeneratingTeam,
+    isGenerating,
   } = useTeam();
+
+  const hasAttemptedGenerationRef = useRef(false);
+  const lastUserIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -43,14 +46,21 @@ export default function MyTeamPage() {
   }, [isAuthenticated]);
 
   useEffect(() => {
+    if (lastUserIdRef.current !== user?.id) {
+      lastUserIdRef.current = user?.id || null;
+      hasAttemptedGenerationRef.current = false;
+    }
+
     if (
       user?.teamGenerationStatus === "PENDING" &&
-      !isGeneratingTeam &&
-      !teamData
+      !isGenerating &&
+      !teamData &&
+      !hasAttemptedGenerationRef.current
     ) {
+      hasAttemptedGenerationRef.current = true;
       generateTeam();
     }
-  }, [user?.teamGenerationStatus, generateTeam, isGeneratingTeam, teamData]);
+  }, [user?.id, user?.teamGenerationStatus, isGenerating, teamData]);
 
   if (isLoadingTeam) {
     return (
@@ -70,7 +80,8 @@ export default function MyTeamPage() {
     );
   }
 
-  if (isGeneratingTeam || user?.teamGenerationStatus === "PROCESSING") {
+  if (isGenerating || user?.teamGenerationStatus === "PROCESSING") {
+    debugger;
     return (
       <LoadingState
         title="Generating your team..."
