@@ -26,14 +26,31 @@ const groupPlayersByPosition = (players: any[]): PlayersByPosition => {
 };
 
 export default function MyTeamPage() {
-  const { isAuthenticated } = useAuthStore();
-  const { teamData, isLoadingTeam, refetchTeam, teamError } = useTeam();
+  const { isAuthenticated, user } = useAuthStore();
+  const {
+    teamData,
+    isLoadingTeam,
+    refetchTeam,
+    teamError,
+    generateTeam,
+    isGeneratingTeam,
+  } = useTeam();
 
   useEffect(() => {
     if (!isAuthenticated) {
       window.location.href = "/login";
     }
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (
+      user?.teamGenerationStatus === "PENDING" &&
+      !isGeneratingTeam &&
+      !teamData
+    ) {
+      generateTeam();
+    }
+  }, [user?.teamGenerationStatus, generateTeam, isGeneratingTeam, teamData]);
 
   if (isLoadingTeam) {
     return (
@@ -49,6 +66,15 @@ export default function MyTeamPage() {
       <LoadingState
         title="Setting up your team..."
         description="Your team is being generated automatically. This may take a few moments."
+      />
+    );
+  }
+
+  if (isGeneratingTeam || user?.teamGenerationStatus === "PROCESSING") {
+    return (
+      <LoadingState
+        title="Generating your team..."
+        description="Please wait while we create your perfect squad. This may take a few moments."
       />
     );
   }

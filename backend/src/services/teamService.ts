@@ -79,16 +79,23 @@ export class TeamService {
 
     try {
       await this.teamGenerationJob.execute(userId);
+
+      return {
+        message: 'Team generation completed successfully',
+        status: TeamGenerationStatus.COMPLETED,
+      };
     } catch (error) {
+      await prisma.user.update({
+        where: { id: userId },
+        data: {
+          teamGenerationStatus: TeamGenerationStatus.PENDING,
+        },
+      });
+
       throw new Error(
         `Team generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
-
-    return {
-      message: 'Team generation completed successfully',
-      status: TeamGenerationStatus.COMPLETED,
-    };
   }
 
   private calculateTeamStats(

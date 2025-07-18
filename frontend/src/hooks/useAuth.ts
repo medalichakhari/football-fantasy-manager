@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import { apiClient, handleApiResponse } from "../lib/api-client";
 import { AuthRequest, AuthResponse } from "../types/auth";
 import { useAuthStore } from "../store/authStore";
@@ -34,7 +35,8 @@ const authApi = {
 };
 
 export const useAuth = () => {
-  const { login, logout, setLoading, setError, clearError } = useAuthStore();
+  const { login, logout, setLoading, setError, clearError, updateUser } =
+    useAuthStore();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -141,11 +143,20 @@ export const useAuth = () => {
     navigate("/login");
   };
 
+  useEffect(() => {
+    if (profileQuery.data) {
+      updateUser({
+        budget: profileQuery.data.budget,
+        teamGenerationStatus: profileQuery.data.teamGenerationStatus,
+      });
+    }
+  }, [profileQuery.data, updateUser]);
+
   return {
-    login: loginMutation.mutateAsync,
+    login: loginMutation.mutate,
     logout: handleLogout,
-    forgotPassword: forgotPasswordMutation.mutateAsync,
-    resetPassword: resetPasswordMutation.mutateAsync,
+    forgotPassword: forgotPasswordMutation.mutate,
+    resetPassword: resetPasswordMutation.mutate,
 
     isLoggingIn: loginMutation.isPending,
     isSendingResetEmail: forgotPasswordMutation.isPending,
