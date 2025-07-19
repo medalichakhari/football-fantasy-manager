@@ -7,7 +7,7 @@ module.exports = {
     '^.+\\.ts$': 'ts-jest',
   },
   collectCoverageFrom: ['src/**/*.ts', '!src/**/*.d.ts', '!src/app.ts'],
-  moduleNameMapping: {
+  moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@controllers/(.*)$': '<rootDir>/src/controllers/$1',
     '^@services/(.*)$': '<rootDir>/src/services/$1',
