@@ -8,5 +8,9 @@ RUN npm install
 COPY . .
 RUN npx prisma generate
 
+# Copy and make start script executable
+COPY start-dev.sh ./
+RUN chmod +x start-dev.sh
+
 EXPOSE 3001
-CMD ["npm", "run", "dev"]
+CMD ["./start-dev.sh"]
