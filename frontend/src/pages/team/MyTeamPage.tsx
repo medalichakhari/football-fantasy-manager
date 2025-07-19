@@ -81,7 +81,6 @@ export default function MyTeamPage() {
   }
 
   if (isGenerating || user?.teamGenerationStatus === "PROCESSING") {
-    debugger;
     return (
       <LoadingState
         title="Generating your team..."
