@@ -109,13 +109,20 @@ docker-compose up --build
 
 **Option 2: Manual Setup**
 
+> **Note**: For manual setup, you'll need a PostgreSQL database running locally. You can either:
+>
+> - Run PostgreSQL in a Docker container: `docker run --name postgres -e POSTGRES_PASSWORD=password -e POSTGRES_DB=football_manager -p 5432:5432 -d postgres`
+> - Install PostgreSQL locally and create a database
+>
+> Update the `DATABASE_URL` in your `backend/.env` file to match your local PostgreSQL connection.
+
 ```bash
 # Backend
 cd backend
 npm install
 npm run db:generate
 npm run db:migrate
-npm run db:studio
+npm run db:seed
 npm run dev
 
 # Frontend (in another terminal)
