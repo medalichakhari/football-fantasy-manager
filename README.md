@@ -28,6 +28,7 @@ This application was built to fulfill the requirements of creating a football fa
 - Purchase players from other teams at 95% of asking price
 - Advanced filtering by team name, player name, and price range
 - Real-time market updates and transaction processing
+- **Atomic Transactions**: Each transfer operation uses Prisma transactions to ensure data integrity across 6 database operations (player ownership transfer, budget updates, listing deactivation) preventing race conditions and maintaining consistency during concurrent purchases
 
 ## Technologies Used
 
@@ -202,3 +203,26 @@ The application will be available at:
 - Performance optimization
 - Docker setup refinement
 - Documentation and final polish
+
+## Key Challenge: Concurrent Transaction Management
+
+The most technically challenging aspect was implementing a robust transfer market that handles concurrent transactions while maintaining data consistency. When multiple users attempt to purchase the same player simultaneously, the system needed to ensure only one transaction succeeds without creating race conditions.
+
+**The Problem**: Each player purchase involves 6 critical database operations:
+
+1. Remove player from seller's team (`userPlayer.delete`)
+2. Add player to buyer's team (`userPlayer.create`)
+3. Deduct money from buyer's budget (`user.update`)
+4. Add money to seller's budget (`user.update`)
+5. Update player's market value (`player.update`)
+6. Deactivate the transfer listing (`transferListing.update`)
+
+**The Solution**: Implemented Prisma's `$transaction()` API to wrap all operations in an atomic transaction. This ensures either all operations succeed together, or all are rolled back on failure, preventing data corruption and maintaining financial integrity even under high concurrent load.
+
+## Support & Feedback
+
+If you encounter any issues while running the project or have feedback, please feel free to reach out:
+
+**Email**: medalichakhari.dev@gmail.com
+
+I'm always open to discussing technical implementations, suggestions for improvements, or helping resolve any setup difficulties.
