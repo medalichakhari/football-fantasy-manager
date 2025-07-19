@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useTeam } from "../../hooks/useTeam";
 import { useAuthStore } from "../../store/authStore";
 import { LoadingState, ErrorState } from "../../components/ui/states";
@@ -26,7 +26,7 @@ const groupPlayersByPosition = (players: any[]): PlayersByPosition => {
 };
 
 export default function MyTeamPage() {
-  const { isAuthenticated, user } = useAuthStore();
+  const { user } = useAuthStore();
   const {
     teamData,
     isLoadingTeam,
@@ -36,28 +36,12 @@ export default function MyTeamPage() {
     isGenerating,
   } = useTeam();
 
-  const hasAttemptedGenerationRef = useRef(false);
-  const lastUserIdRef = useRef<string | null>(null);
-
   useEffect(() => {
-    if (!isAuthenticated) {
-      window.location.href = "/login";
-    }
-  }, [isAuthenticated]);
-
-  useEffect(() => {
-    if (lastUserIdRef.current !== user?.id) {
-      lastUserIdRef.current = user?.id || null;
-      hasAttemptedGenerationRef.current = false;
-    }
-
     if (
       user?.teamGenerationStatus === "PENDING" &&
       !isGenerating &&
-      !teamData &&
-      !hasAttemptedGenerationRef.current
+      !teamData
     ) {
-      hasAttemptedGenerationRef.current = true;
       generateTeam();
     }
   }, [user?.id, user?.teamGenerationStatus, isGenerating, teamData]);
