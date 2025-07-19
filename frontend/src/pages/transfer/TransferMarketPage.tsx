@@ -106,24 +106,26 @@ const TransferMarketPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         <PageHeader
           title="Transfer Market"
           description="Buy and sell players to strengthen your team"
         >
-          <Link
-            to="/transfer/my-listings"
-            className="inline-flex items-center border border-gray-300 bg-white text-gray-900 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            My Listings
-          </Link>
-          <Link
-            to="/transfer/sell"
-            className="inline-flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            List Player
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <Link
+              to="/transfer/my-listings"
+              className="inline-flex items-center justify-center border border-gray-300 bg-white text-gray-900 px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors text-sm sm:text-base"
+            >
+              My Listings
+            </Link>
+            <Link
+              to="/transfer/sell"
+              className="inline-flex items-center justify-center bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              List Player
+            </Link>
+          </div>
         </PageHeader>
 
         <FilterPanel
@@ -133,17 +135,9 @@ const TransferMarketPage: React.FC = () => {
           onToggleAdvanced={() => setShowFilters(!showFilters)}
         />
 
-        {/* {buyPlayerError && (
-          <Card className="mb-6 border-red-200 bg-red-50">
-            <CardContent className="p-4">
-              <p className="text-red-600">{buyPlayerError}</p>
-            </CardContent>
-          </Card>
-        )} */}
-
         <Card>
-          <CardHeader>
-            <CardTitle>
+          <CardHeader className="pb-4 sm:pb-6">
+            <CardTitle className="text-lg sm:text-xl">
               Available Players ({marketData?.listings?.length || 0})
             </CardTitle>
           </CardHeader>
@@ -161,9 +155,9 @@ const TransferMarketPage: React.FC = () => {
                 </p>
               </div>
             ) : (
-              <div className="divide-y divide-gray-100">
+              <div className="space-y-4 sm:space-y-6">
                 {marketData?.listings?.map((listing: any) => (
-                  <div key={listing.id} className="p-6">
+                  <div key={listing.id} className="p-4 sm:p-6">
                     <PlayerCard
                       player={listing.player}
                       listing={listing}
@@ -172,7 +166,7 @@ const TransferMarketPage: React.FC = () => {
                           onClick={() => handleBuyPlayer(listing.id, listing)}
                           loading={isBuyingPlayer}
                           disabled={isBuyingPlayer}
-                          className="bg-green-600 hover:bg-green-700"
+                          className="text-sm sm:text-base px-3 py-2 sm:px-4 bg-green-600 hover:bg-green-700 text-white"
                         >
                           {isBuyingPlayer ? "Buying..." : "Buy Now"}
                         </Button>

@@ -1,5 +1,9 @@
 #!/bin/sh
 
+
+echo "🗄️  Applying database migrations..."
+
+
 if npx prisma migrate deploy; then
   echo "Migrations applied successfully!"
 else
@@ -12,4 +16,5 @@ else
   fi
 fi
 
+echo "Starting development server..."
 npm run dev

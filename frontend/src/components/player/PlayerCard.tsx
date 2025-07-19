@@ -55,18 +55,20 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
       onClick={onClick}
     >
       <CardContent className="p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4 flex-1 min-w-0">
-            <PlayerAvatar name={player.name} />
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center space-x-3 sm:space-x-4 flex-1 min-w-0">
+            <div className="flex-shrink-0">
+              <PlayerAvatar name={player.name} />
+            </div>
 
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="text-lg font-semibold text-gray-900 truncate">
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
                   {player.name}
                 </h3>
                 <PositionBadge position={player.position} />
                 {selected && (
-                  <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center ml-auto">
+                  <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center ml-auto sm:ml-0">
                     <svg
                       className="w-3 h-3 text-white"
                       fill="currentColor"
@@ -82,27 +84,31 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
                 )}
               </div>
 
-              <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
+              <div className="flex flex-wrap items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-500">
                 {player.team && (
                   <>
-                    <span>Team: {player.team}</span>
-                    <span>•</span>
+                    <span className="truncate max-w-24 sm:max-w-none">
+                      Team: {player.team}
+                    </span>
+                    <span className="hidden sm:inline">•</span>
                   </>
                 )}
                 {player.skill && (
                   <>
                     <span>Skill: {player.skill}</span>
-                    <span>•</span>
+                    <span className="hidden sm:inline">•</span>
                   </>
                 )}
                 {listing?.seller && (
                   <>
-                    <span>Listed by: {listing.seller.email}</span>
-                    <span>•</span>
+                    <span className="truncate max-w-32 sm:max-w-none">
+                      Listed by: {listing.seller.email}
+                    </span>
+                    <span className="hidden sm:inline">•</span>
                   </>
                 )}
                 {listing?.createdAt && (
-                  <span>
+                  <span className="whitespace-nowrap">
                     Listed: {new Date(listing.createdAt).toLocaleDateString()}
                   </span>
                 )}
@@ -110,9 +116,9 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center space-x-4 flex-shrink-0">
-            <div className="text-right">
-              <div className="text-xl font-bold text-gray-900">
+          <div className="flex items-center justify-between sm:justify-end sm:space-x-4 sm:flex-shrink-0">
+            <div className="text-left sm:text-right">
+              <div className="text-lg sm:text-xl font-bold text-gray-900">
                 {formatCurrency(displayPrice)}
               </div>
               {listing && !showSellerView && (
@@ -137,13 +143,15 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
                 </div>
               )}
               {listing && listing.price !== player.price && (
-                <div className="text-sm text-gray-500">
+                <div className="text-xs sm:text-sm text-gray-500">
                   Market value: {formatCurrency(player.price)}
                 </div>
               )}
             </div>
 
-            {actionButton}
+            {actionButton && (
+              <div className="flex-shrink-0">{actionButton}</div>
+            )}
           </div>
         </div>
       </CardContent>
