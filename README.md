@@ -1,253 +1,204 @@
-# Football Fantasy Manager
+# Football Online Manager
 
-A modern, full-stack fantasy football management application built with enterprise-grade architecture, demonstrating production-ready development practices and comprehensive TypeScript implementation.
+A web application for fantasy football management where users can build and manage their teams, trade players, and compete with others in a virtual transfer market.
 
 ## Project Overview
 
-Football Fantasy Manager is a comprehensive web application that enables users to create and manage fantasy football teams with a $5,000,000 budget. The system features real-time player transfers, automated team generation, and a sophisticated transfer market with advanced filtering capabilities.
+This application was built to fulfill the requirements of creating a football fantasy manager web app. Users start by registering with email and password, then generate their team through a separate process, receiving a $5M budget to participate in the transfer market and trade players.
 
-**Key Features:**
+### Core Functionalities
 
-- **Team Management**: Create and manage fantasy teams with budget constraints
-- **Transfer Market**: Buy and sell players with dynamic pricing and filtering
-- **Authentication**: Unified login/registration system with JWT security
-- **Background Processing**: Automated team generation with email notifications
-- **Real-time Updates**: Live transfer market updates and notifications
+**User Management**
 
-## Architecture & Technology Stack
+- Single authentication flow handling both registration and login
+- Email and password-based authentication with JWT tokens
+- User profile management with budget tracking
 
-### Backend (Node.js + TypeScript)
+**Team System**
 
-- **Framework**: Express.js with MVC architecture
-- **Database**: PostgreSQL with Prisma ORM for type-safe operations
-- **Authentication**: JWT-based security with bcrypt password hashing
-- **Background Jobs**: Automated processing with email integration
-- **Validation**: Zod runtime validation with comprehensive error handling
-- **Code Quality**: ESLint + Prettier + strict TypeScript configuration
+- Automatic team generation as a separate flow after registration:
+  - $5,000,000 transfer budget
+  - 20 players distributed across positions (3 GK, 6 DEF, 6 MID, 5 ATT)
+- Dedicated team generation endpoint and process
+- Team composition validation (15-25 players required)
 
-### Frontend (React + TypeScript)
+**Transfer Market**
 
-- **Framework**: React 18 with TypeScript and Vite
-- **UI Components**: Tailwind CSS + Shadcn/UI design system
-- **State Management**: Zustand stores + React Query for server state
-- **Routing**: React Router v6 with protected routes
-- **Forms**: React Hook Form with Zod validation
-- **HTTP Client**: Axios with interceptors and error handling
+- List players for sale with custom asking prices
+- Purchase players from other teams at 95% of asking price
+- Advanced filtering by team name, player name, and price range
+- Real-time market updates and transaction processing
 
-### Development & DevOps
+## Technologies Used
 
-- **Containerization**: Docker + Docker Compose for development environment
-- **Code Quality**: Husky pre-commit hooks with automated linting and formatting
-- **Type Safety**: Strict TypeScript mode across entire application
-- **Testing**: Jest (backend) + Vitest (frontend) testing suites
-- **Development**: Hot reload and efficient development workflows
+**Backend**
+
+- Node.js with Express.js framework
+- TypeScript for type safety
+- PostgreSQL database with Prisma ORM
+- JWT for authentication
+- Zod for request validation
+- Automated team generation system
+
+**Frontend**
+
+- React 18 with TypeScript
+- Vite for build tooling
+- Tailwind CSS for styling
+- Zustand for state management
+- React Query for server state
+- React Router for navigation
+
+**Development Tools**
+
+- Docker and Docker Compose for containerization
+- ESLint and Prettier for code quality
+- Husky for pre-commit hooks
 
 ## Project Structure
 
 ```
 football-fantasy-manager/
-├── backend/                 # Node.js + Express API
+├── backend/
 │   ├── src/
-│   │   ├── controllers/     # HTTP request handlers
-│   │   ├── services/        # Business logic layer
-│   │   ├── routes/          # API route definitions
-│   │   ├── middleware/      # Authentication, validation, error handling
-│   │   ├── models/          # Prisma database models
-│   │   ├── jobs/            # Background job processing
-│   │   ├── types/           # TypeScript type definitions
-│   │   └── utils/           # Helper functions and utilities
-│   ├── prisma/              # Database schema and migrations
-│   └── tests/               # Unit and integration tests
-│
-├── frontend/                # React + TypeScript SPA
+│   │   ├── controllers/     # Request handlers
+│   │   ├── services/        # Business logic
+│   │   ├── middleware/      # Auth and validation
+│   │   ├── routes/          # API routes
+│   │   └── utils/           # Helper functions
+│   ├── prisma/              # Database schema
+│   └── .env.dev             # Environment template
+├── frontend/
 │   ├── src/
-│   │   ├── components/      # Reusable UI components
-│   │   ├── pages/           # Route-based page components
+│   │   ├── components/      # UI components
+│   │   ├── pages/           # Application pages
 │   │   ├── hooks/           # Custom React hooks
-│   │   ├── store/           # Zustand state management
-│   │   ├── services/        # API communication layer
-│   │   └── types/           # TypeScript type definitions
-│   └── public/              # Static assets
-│
-├── docker-compose.yml       # Development environment setup
-└── .husky/                  # Git hooks configuration
+│   │   ├── store/           # State management
+│   │   └── services/        # API communication
+│   └── .env.dev             # Environment template
+└── docker-compose.yml       # Development setup
 ```
 
-## Implementation Status
-
-### Core Authentication System
-
-- **Unified Authentication Flow**: Single endpoint handling both login and registration
-- **JWT Security**: Secure token-based authentication with refresh capability
-- **Password Security**: bcrypt hashing with salt rounds
-- **Profile Management**: User profile endpoints with budget tracking
-- **Email Integration**: Welcome emails and password reset functionality
-
-### Team Management System
-
-- **Team Creation**: Automated team generation with balanced player distribution
-- **Budget Management**: $5,000,000 budget allocation and tracking
-- **Player Statistics**: Comprehensive player data with skill ratings
-- **Team Validation**: Position requirements and squad composition rules
-
-### Transfer Market System
-
-- **Market Listings**: Create and manage player transfer listings
-- **Player Trading**: Buy/sell functionality with price validation
-- **Market Filtering**: Advanced search and filtering capabilities
-- **Dynamic Pricing**: Real-time price updates based on transfers
-- **Transaction Management**: Secure database transactions for transfers
-
-### Frontend Application
-
-- **Responsive UI**: Modern interface with Tailwind CSS
-- **Protected Routes**: Authentication-based route protection
-- **State Management**: Efficient state handling with Zustand and React Query
-- **Form Validation**: Comprehensive form handling with error management
-- **API Integration**: Type-safe API communication layer
-
-### Development Infrastructure
-
-- **Type Safety**: Strict TypeScript configuration across full stack
-- **Code Quality**: Automated linting, formatting, and pre-commit hooks
-- **Development Environment**: Docker-based setup with hot reload
-- **Testing Framework**: Comprehensive testing setup for both frontend and backend
-
-## Quick Start
+## Setup Instructions
 
 ### Prerequisites
 
-- Node.js 18+
-- Docker & Docker Compose
-- PostgreSQL (or use Docker)
+- Node.js 18 or higher
+- Docker and Docker Compose
 
-### Setup Instructions
+### Environment Configuration
 
-1. **Clone and Setup Environment**
-
-   ```bash
-   git clone <repository-url>
-   cd football-fantasy-manager
-   docker-compose up -d
-   ```
-
-2. **Backend Setup**
-
-   ```bash
-   cd backend
-   npm install
-   cp .env.example .env
-   npm run db:migrate
-   npm run db:seed
-   npm run dev
-   ```
-
-3. **Frontend Setup**
-
-   ```bash
-   cd frontend
-   npm install
-   cp .env.example .env
-   npm run dev
-   ```
-
-4. **Access Application**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:3001
-   - Health Check: http://localhost:3001/health
-
-## API Endpoints
-
-### Authentication
-
-- `POST /api/auth/authenticate` - Unified login/registration
-- `GET /api/auth/profile` - User profile information
-- `POST /api/auth/refresh-token` - Token refresh
-- `POST /api/auth/forgot-password` - Password reset request
-- `POST /api/auth/reset-password` - Password reset confirmation
-
-### Team Management
-
-- `GET /api/team/my-team` - Get user's current team
-- `POST /api/team/generate` - Initiate team generation
-
-### Transfer Market
-
-- `GET /api/transfer/market` - Get market listings with filtering
-- `GET /api/transfer/my-listings` - Get user's active listings
-- `POST /api/transfer/market` - Create new player listing
-- `POST /api/transfer/buy` - Purchase player from market
-- `DELETE /api/transfer/listings/:id` - Remove player listing
-
-## Development Commands
-
-### Backend
+I've provided environment templates for both frontend and backend. Copy the provided configurations:
 
 ```bash
-npm run dev
-npm run build
-npm run test
+# Backend environment
+cp backend/.env.dev backend/.env
+
+# Frontend environment
+cp frontend/.env.dev frontend/.env
+```
+
+### Running the Application
+
+**Option 1: Docker (Recommended)**
+
+```bash
+docker-compose up --build
+```
+
+**Option 2: Manual Setup**
+
+```bash
+# Backend
+cd backend
+npm install
+npm run db:generate
 npm run db:migrate
-npm run db:seed
-npm run lint
-npm run format
-```
-
-### Frontend
-
-```bash
+npm run db:studio
 npm run dev
-npm run build
-npm run test
-npm run lint
+
+# Frontend (in another terminal)
+cd frontend
+npm install
+npm run dev
 ```
 
-## Environment Configuration
+The application will be available at:
 
-### Backend Environment Variables
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:3001
 
-```env
-NODE_ENV=development
-PORT=3001
-DATABASE_URL="postgresql://username:password@localhost:5432/football_fantasy"
-JWT_SECRET="your-super-secret-jwt-key"
-JWT_EXPIRES_IN="7d"
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_SECURE=false
-SMTP_USER=your-email@gmail.com
-SMTP_PASS=your-app-password
-CORS_ORIGIN="http://localhost:3000"
-```
+## Development Scope & Time Report
 
-### Frontend Environment Variables
+### Scope 1: Project Setup & Foundation (6 hours)
 
-```env
-VITE_API_URL="http://localhost:3001/api"
-VITE_APP_NAME="Football Fantasy Manager"
-```
+- Initial project structure and Docker configuration
+- Database schema design with Prisma (User, Team, Player, TransferListing models)
+- Express.js backend setup with TypeScript and middleware
+- React frontend setup with Vite, routing, and basic components
+- Authentication infrastructure (JWT, middleware, store setup)
 
-## Development Standards
+### Scope 2: Authentication Feature (Complete Backend + Frontend) (8 hours)
 
-**Code Quality:**
+**Backend Implementation (4h):**
 
-- TypeScript strict mode enabled
-- ESLint with TypeScript-specific rules
-- Prettier for consistent formatting
-- Husky pre-commit hooks for quality assurance
+- authController.ts - unified login/registration logic
+- JWT token generation and validation middleware
+- User model and validation schemas
+- Auth routes and error handling
 
-**Architecture Principles:**
+**Frontend Implementation (4h):**
 
-- Clear separation of concerns with MVC pattern
-- Comprehensive type safety throughout application
-- Consistent error handling and validation
-- Performance-optimized queries and caching strategies
+- LoginPage.tsx with unified login/registration form
+- useAuth.ts hook for authentication logic
+- Auth store with Zustand for state management
+- ProtectedRoute component and navigation integration
 
-**Security Implementation:**
+### Scope 3: Team Management Feature (Complete Backend + Frontend) (10 hours)
 
-- JWT-based authentication with secure token handling
-- Input validation with Zod schemas
-- SQL injection protection with Prisma ORM
-- CORS configuration and rate limiting
+**Backend Implementation (5h):**
 
-This project demonstrates proficiency in modern web development practices, full-stack architecture design, and production-ready code implementation suitable for enterprise-level applications.
+- teamController.ts with team generation logic
+- Team and Player models with relationships
+- Team generation algorithm and validation
+- Database seeding with player data
+
+**Frontend Implementation (5h):**
+
+- MyTeamPage.tsx for team display and management
+- useTeam.ts hook for team operations
+- Team components and player cards
+- Budget tracking and team composition UI
+
+### Scope 4: Transfer Market Feature (Complete Backend + Frontend) (12 hours)
+
+**Backend Implementation (6h):**
+
+- transferController.ts with market CRUD operations
+- Transfer listing model and relationships
+- Buy/sell transaction logic with price calculations
+- Advanced filtering and search functionality
+
+**Frontend Implementation (6h):**
+
+- TransferMarketPage.tsx with market listings and filters
+- SellPlayerPage.tsx for creating player listings
+- MyListingsPage.tsx for managing user listings
+- useTransfer.ts hook with React Query integration
+- Transfer components and market interface
+
+### Scope 5: UI/UX Polish & Integration (6 hours)
+
+- Responsive design implementation across all components
+- Navigation component and layout optimization
+- Error handling and loading states
+- Component styling with Tailwind CSS
+- Mobile-first responsive adjustments
+
+### Scope 6: Testing & Documentation (3 hours)
+
+- End-to-end testing of user flows
+- API integration debugging
+- Performance optimization
+- Docker setup refinement
+- Documentation and final polish
