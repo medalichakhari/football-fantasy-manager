@@ -6,11 +6,11 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
+
+RUN sed -i 's/\r$//' start-dev.sh && chmod +x start-dev.sh
+
 RUN npx prisma generate
 
-# Copy and make start script executable
-COPY start-dev.sh ./
-RUN chmod +x start-dev.sh
-
 EXPOSE 3001
-CMD ["./start-dev.sh"]
+
+CMD ["/bin/bash", "./start-dev.sh"]

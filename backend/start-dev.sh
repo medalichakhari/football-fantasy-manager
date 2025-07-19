@@ -1,8 +1,6 @@
-#!/bin/sh
-
+#!/bin/bash
 
 echo "🗄️  Applying database migrations..."
-
 
 if npx prisma migrate deploy; then
   echo "Migrations applied successfully!"
