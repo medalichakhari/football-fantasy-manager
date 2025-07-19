@@ -63,21 +63,40 @@ football-fantasy-manager/
 ├── backend/
 │   ├── src/
 │   │   ├── controllers/     # Request handlers
-│   │   ├── services/        # Business logic
-│   │   ├── middleware/      # Auth and validation
-│   │   ├── routes/          # API routes
-│   │   └── utils/           # Helper functions
-│   ├── prisma/              # Database schema
-│   └── .env.dev             # Environment template
+│   │   ├── services/        # Business logic layer
+│   │   ├── middleware/      # Auth, validation & error handling
+│   │   ├── routes/          # API endpoints
+│   │   ├── models/          # Database connection & models
+│   │   ├── types/           # TypeScript type definitions
+│   │   ├── utils/           # Helper functions & utilities
+│   │   ├── validation/      # Input validation schemas
+│   │   ├── jobs/            # Background job processing
+│   │   └── templates/       # Email templates
+│   ├── prisma/              # Database schema & migrations
+│   ├── tests/               # Unit & integration tests
+│   ├── scripts/             # Build & deployment scripts
+│   └── .env.dev             # Environment configuration template
 ├── frontend/
 │   ├── src/
-│   │   ├── components/      # UI components
-│   │   ├── pages/           # Application pages
+│   │   ├── components/      # Reusable UI components
+│   │   │   ├── ui/          # Base UI components
+│   │   │   ├── player/      # Player-related components
+│   │   │   ├── team/        # Team management components
+│   │   │   └── transfer/    # Transfer market components
+│   │   ├── pages/           # Application pages & routes
+│   │   │   ├── auth/        # Authentication pages
+│   │   │   ├── team/        # Team management pages
+│   │   │   └── transfer/    # Transfer market pages
 │   │   ├── hooks/           # Custom React hooks
-│   │   ├── store/           # State management
-│   │   └── services/        # API communication
-│   └── .env.dev             # Environment template
-└── docker-compose.yml       # Development setup
+│   │   ├── store/           # State management (Zustand)
+│   │   ├── lib/             # API client & utilities
+│   │   ├── types/           # TypeScript type definitions
+│   │   ├── utils/           # Helper functions
+│   │   └── services/        # API service layer 
+│   ├── public/              # Static assets
+│   └── .env.dev             # Environment configuration template
+├── docker-compose.yml       # Development environment setup
+└── README.md                # Project documentation
 ```
 
 ## Setup Instructions
@@ -104,7 +123,7 @@ cp frontend/.env.dev frontend/.env
 **Option 1: Docker (Recommended)**
 
 ```bash
-docker-compose up --build
+docker-compose up --build -d
 ```
 
 **Option 2: Manual Setup**
