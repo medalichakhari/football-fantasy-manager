@@ -33,12 +33,12 @@ const transferApi = {
   getUserListings: async (
     page: number = 1,
     limit: number = 6
-  ): Promise<TransferMarketResponse> => {
+  ): Promise<TransferListing[]> => {
     const params = new URLSearchParams();
     params.append("page", page.toString());
     params.append("limit", limit.toString());
 
-    const response = await apiClient.get<ApiResponse<TransferMarketResponse>>(
+    const response = await apiClient.get<ApiResponse<TransferListing[]>>(
       `/transfer/my-listings?${params}`
     );
     return handleApiResponse(response).data!;

@@ -40,6 +40,10 @@ model Player {
   owners           UserPlayer[]
   transferListings TransferListing[]
 
+  @@index([position])
+  @@index([team])
+  @@index([price])
+  @@index([name])
   @@map("players")
 }
 
@@ -71,6 +75,11 @@ model TransferListing {
   seller User   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
 
+  @@index([isActive])
+  @@index([price])
+  @@index([createdAt])
+  @@index([sellerId])
+  @@index([playerId])
   @@map("transfer_listings")
 }
 
